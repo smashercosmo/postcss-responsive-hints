@@ -1,15 +1,17 @@
 {
   "name": "postcss-responsive-hints",
-  "version": "0.1.0",
+  "version": "0.0.0-development",
   "description": "PostCSS plugin that makes it easier to write responsive styles",
   "main": "src/index.js",
   "scripts": {
     "test": "jest",
-    "semantic-release": "semantic-release pre && npm publish && semantic-release post"
+    "semantic-release": "semantic-release pre && npm publish && semantic-release post",
+    "changelog:preview": "sr-changelog",
+    "changelog:commit": "sr-changelog commit"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/smashercosmo/postcss-responsive-properties.git"
+    "url": "https://github.com/smashercosmo/postcss-responsive-hints.git"
   },
   "keywords": [
     "postcss",
@@ -18,14 +20,20 @@
   "author": "Vladislav Shkodin <smashercosmo@gmail.com>",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/smashercosmo/postcss-responsive-properties/issues"
+    "url": "https://github.com/smashercosmo/postcss-responsive-hints/issues"
   },
-  "homepage": "https://github.com/smashercosmo/postcss-responsive-properties#readme",
+  "homepage": "https://github.com/smashercosmo/postcss-responsive-hints#readme",
   "dependencies": {
     "postcss": "6.0.13"
   },
   "devDependencies": {
     "jest": "21.2.1",
-    "semantic-release": "8.0.3"
+    "semantic-release": "^8.0.3",
+    "semantic-release-tamia": "1.1.1"
+  },
+  "release": {
+    "analyzeCommits": "semantic-release-tamia/analyzeCommits",
+    "generateNotes": "semantic-release-tamia/generateNotes",
+    "verifyRelease": "semantic-release-tamia/verifyRelease"
   }
 }

@@ -1,4 +1,4 @@
-# postcss-responsive-properties
+# postcss-responsive-hints
 
 PostCSS plugin that makes it easier to write responsive styles.
 Heavily inspired by [styled-system](https://github.com/jxnblk/styled-system).
@@ -6,7 +6,7 @@ Heavily inspired by [styled-system](https://github.com/jxnblk/styled-system).
 ## Installation
 
 ```console
-$ npm install postcss-responsive-properties
+$ npm install postcss-responsive-hints
 ```
 
 ## Usage
@@ -15,7 +15,7 @@ $ npm install postcss-responsive-properties
 var postcss = require("postcss")
 
 var output = postcss()
-  .use(require('postcss-responsive-properties')(/* options */))
+  .use(require('postcss-responsive-hints')(/* options */))
   .process(require("fs").readFileSync("input.css", "utf8"))
   .css
 ```
