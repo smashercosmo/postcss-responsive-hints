@@ -1,0 +1,31 @@
+{
+  "name": "postcss-responsive-hints",
+  "version": "0.1.0",
+  "description": "PostCSS plugin that makes it easier to write responsive styles",
+  "main": "src/index.js",
+  "scripts": {
+    "test": "jest",
+    "semantic-release": "semantic-release pre && npm publish && semantic-release post"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/smashercosmo/postcss-responsive-properties.git"
+  },
+  "keywords": [
+    "postcss",
+    "postcss-plugin"
+  ],
+  "author": "Vladislav Shkodin <smashercosmo@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/smashercosmo/postcss-responsive-properties/issues"
+  },
+  "homepage": "https://github.com/smashercosmo/postcss-responsive-properties#readme",
+  "dependencies": {
+    "postcss": "6.0.13"
+  },
+  "devDependencies": {
+    "jest": "21.2.1",
+    "semantic-release": "8.0.3"
+  }
+}
