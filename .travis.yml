@@ -8,6 +8,9 @@ node_js:
   - '7'
   - '6'
   - '4'
+before_install:
+  # Upgrade npm
+  - if [[ `npm -v` != 5* ]]; then npm install -g npm@latest; fi
 before_script:
   - npm prune
 script:
