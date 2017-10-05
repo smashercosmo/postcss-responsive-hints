@@ -11,6 +11,7 @@ const VALUE_REGEXP = /\/\*\s*\|\s*(.*?)\s*\|\s*\*\//
 const SPLIT_REGEXP = /\s*\|\s*/
 
 const defaults = {
+  comments: false,
   breakpoints: [
     '480px',
     '768px',
@@ -21,7 +22,7 @@ const defaults = {
 
 module.exports = postcss.plugin(pkg.name, (options = {}) => {
   const settings = Object.assign({}, defaults, options)
-  const breakpoints = settings.breakpoints
+  const { breakpoints, comments } = settings
 
   return css => {
     css.walkRules(rule => {
@@ -29,19 +30,18 @@ module.exports = postcss.plugin(pkg.name, (options = {}) => {
       const allDecls = new Map(breakpointTuples)
 
       rule.walkDecls(decl => {
-        const rawValue = decl.raw('value')
+        const value = comments
+          ? ((decl.raws || {}).value || {}).raw
+          : decl.value
 
-        // When we create new declarations
-        // they don't have raw value
-        if (!rawValue || !rawValue.raw) return
+        if (!value) return
 
-        const responsiveValuesMatch = rawValue.raw.match(VALUE_REGEXP)
+        let responsiveValuesString = value
 
-        if (!responsiveValuesMatch) return
-
-        const responsiveValuesString = responsiveValuesMatch[1]
-
-        if (!responsiveValuesString) return
+        if (comments) {
+          const responsiveValuesMatch = value.match(VALUE_REGEXP) || []
+          responsiveValuesString = responsiveValuesMatch[1]
+        }
 
         // e.g. ['10px', 'x', 10px]
         const responsiveValues = responsiveValuesString
@@ -50,6 +50,11 @@ module.exports = postcss.plugin(pkg.name, (options = {}) => {
 
         if (!responsiveValues.length) return
 
+        const initialValue = comments
+          ? decl.value
+          : responsiveValues.shift()
+
+        // responsiveValues without initial value
         if (responsiveValues.length > breakpoints.length) {
           throw new Error(
             'Responsive values number is greater than breakpoints number'
@@ -66,6 +71,8 @@ module.exports = postcss.plugin(pkg.name, (options = {}) => {
 
           allDecls.get(i).push(newDecl);
         })
+
+        decl.value = initialValue
       })
 
       let prevMediaQuery = null
