@@ -12,10 +12,10 @@ $ npm install postcss-responsive-hints
 ## Usage
 
 ```js
-var postcss = require("postcss")
+const postcss = require("postcss")
 
-var output = postcss()
-  .use(require('postcss-responsive-hints')(/* options */))
+const output = postcss()
+  .use(require('postcss-responsive-hints')({/* options */}))
   .process(require("fs").readFileSync("input.css", "utf8"))
   .css
 ```
@@ -24,7 +24,7 @@ Having the following styles in `input.css`:
 
 ```css
 .test {
-    padding: 10px /* | 20px | x | 30px | */;
+    padding: 10px | 20px | x | 30px;
 }
 ```
 
@@ -32,7 +32,7 @@ you will get:
 
 ```css
 .test {
-    padding: 10px /* | 20px | x | 30px | */;
+    padding: 10px;
 }
 
 @media (min-width: 480px) {
@@ -47,6 +47,29 @@ you will get:
     .test {
         padding: 30px;
     }
+}
+```
+
+## Options
+
+#### breakpoints: `Array<string>`
+
+> default: `['480px', '768px', '1024px', '1200px']`
+
+Provide a custom set of breakpoints
+
+#### comments: `boolean`
+
+> default: `false`
+
+Allows to avoid non-standard syntax by wrapping responsive
+hints in css comments
+
+Example:
+
+```css
+.test {
+    padding: 10px /* | 20px | x | 30px | */;
 }
 ```
 
