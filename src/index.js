@@ -48,11 +48,11 @@ module.exports = postcss.plugin(pkg.name, (options = {}) => {
           .split(SPLIT_REGEXP)
           .filter(Boolean)
 
-        if (!responsiveValues.length) return
-
         const initialValue = comments
           ? decl.value
           : responsiveValues.shift()
+
+        if (!responsiveValues.length) return
 
         // responsiveValues without initial value
         if (responsiveValues.length > breakpoints.length) {
