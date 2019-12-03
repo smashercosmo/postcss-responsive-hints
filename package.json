@@ -5,9 +5,26 @@
   "main": "src/index.js",
   "scripts": {
     "test": "jest",
-    "semantic-release": "semantic-release pre && npm publish && semantic-release post",
-    "changelog:preview": "sr-changelog",
-    "changelog:commit": "sr-changelog commit"
+    "lint": "eslint './src/**/*.js' './example/**/*.js'",
+    "commit": "git-cz",
+    "semantic-release": "semantic-release",
+    "build:example": "NODE_ENV=production webpack --progress --config ./example/webpack/webpack.production.config.js",
+    "start:example": "NODE_ENV=development webpack --progress --config ./example/webpack/webpack.development.config.js"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "npm run lint"
+    }
+  },
+  "prettier": {
+    "semi": false,
+    "singleQuote": true,
+    "trailingComma": "all",
+    "bracketSpacing": true,
+    "jsxBracketSameLine": true
+  },
+  "engines": {
+    "node": ">=10"
   },
   "repository": {
     "type": "git",
@@ -23,17 +40,37 @@
     "url": "https://github.com/smashercosmo/postcss-responsive-hints/issues"
   },
   "homepage": "https://github.com/smashercosmo/postcss-responsive-hints#readme",
-  "dependencies": {
-    "postcss": "6.0.13"
+  "peerDependencies": {
+    "postcss": ">=6"
   },
   "devDependencies": {
-    "jest": "21.2.1",
-    "semantic-release": "^8.0.3",
-    "semantic-release-tamia": "1.1.1"
+    "app-root-path": "3.0.0",
+    "clean-webpack-plugin": "3.0.0",
+    "commitizen": "4.0.3",
+    "css-loader": "3.2.1",
+    "cz-conventional-changelog": "3.0.2",
+    "eslint": "6.7.2",
+    "eslint-config-airbnb-base": "14.0.0",
+    "eslint-config-prettier": "6.7.0",
+    "eslint-plugin-import": "2.18.2",
+    "eslint-plugin-prettier": "3.1.1",
+    "html-webpack-plugin": "3.2.0",
+    "husky": "3.1.0",
+    "jest": "24.9.0",
+    "mini-css-extract-plugin": "0.8.0",
+    "postcss": "7.0.23",
+    "postcss-loader": "3.0.0",
+    "prettier": "1.19.1",
+    "semantic-release": "15.13.31",
+    "semantic-release-cli": "5.2.3",
+    "style-loader": "1.0.1",
+    "webpack": "4.41.2",
+    "webpack-cli": "3.3.10",
+    "webpack-plugin-serve": "0.12.1"
   },
-  "release": {
-    "analyzeCommits": "semantic-release-tamia/analyzeCommits",
-    "generateNotes": "semantic-release-tamia/generateNotes",
-    "verifyRelease": "semantic-release-tamia/verifyRelease"
+  "config": {
+    "commitizen": {
+      "path": "./node_modules/cz-conventional-changelog"
+    }
   }
 }

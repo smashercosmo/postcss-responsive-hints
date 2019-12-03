@@ -12,16 +12,11 @@ const SPLIT_REGEXP = /\s*\|\s*/
 
 const defaults = {
   comments: false,
-  breakpoints: [
-    '480px',
-    '768px',
-    '1024px',
-    '1200px',
-  ]
+  breakpoints: ['480px', '768px', '1024px', '1200px'],
 }
 
 module.exports = postcss.plugin(pkg.name, (options = {}) => {
-  const settings = Object.assign({}, defaults, options)
+  const settings = { ...defaults, ...options }
   const { breakpoints, comments } = settings
 
   return css => {
@@ -40,6 +35,7 @@ module.exports = postcss.plugin(pkg.name, (options = {}) => {
 
         if (comments) {
           const responsiveValuesMatch = value.match(VALUE_REGEXP) || []
+          // eslint-disable-next-line prefer-destructuring
           responsiveValuesString = responsiveValuesMatch[1]
         }
 
@@ -48,16 +44,14 @@ module.exports = postcss.plugin(pkg.name, (options = {}) => {
           .split(SPLIT_REGEXP)
           .filter(Boolean)
 
-        const initialValue = comments
-          ? decl.value
-          : responsiveValues.shift()
+        const initialValue = comments ? decl.value : responsiveValues.shift()
 
         if (!responsiveValues.length) return
 
         // responsiveValues without initial value
         if (responsiveValues.length > breakpoints.length) {
           throw new Error(
-            'Responsive values number is greater than breakpoints number'
+            'Responsive values number is greater than breakpoints number',
           )
         }
 
@@ -69,9 +63,10 @@ module.exports = postcss.plugin(pkg.name, (options = {}) => {
             value: responsiveValue,
           })
 
-          allDecls.get(i).push(newDecl);
+          allDecls.get(i).push(newDecl)
         })
 
+        // eslint-disable-next-line no-param-reassign
         decl.value = initialValue
       })
 
@@ -102,7 +97,7 @@ module.exports = postcss.plugin(pkg.name, (options = {}) => {
         }
 
         prevMediaQuery = mediaQuery
-      });
+      })
     })
   }
-});
+})
