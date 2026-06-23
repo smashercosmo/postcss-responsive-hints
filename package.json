@@ -9,11 +9,14 @@
     "commit": "git-cz",
     "semantic-release": "semantic-release",
     "build:example": "NODE_ENV=production webpack --progress --config ./example/webpack/webpack.production.config.js",
-    "start:example": "NODE_ENV=development webpack --progress --config ./example/webpack/webpack.development.config.js"
+    "start:example": "NODE_ENV=development webpack --progress --config ./example/webpack/webpack.development.config.js",
+    "actions:update": "actions-up",
+    "changes:generate": "beachball change",
+    "changes:check": "beachball check"
   },
   "husky": {
     "hooks": {
-      "pre-commit": "npm run lint"
+      "pre-commit": "pnpm lint"
     }
   },
   "prettier": {
@@ -22,9 +25,6 @@
     "trailingComma": "all",
     "bracketSpacing": true,
     "jsxBracketSameLine": true
-  },
-  "engines": {
-    "node": ">=10"
   },
   "repository": {
     "type": "git",
@@ -44,7 +44,9 @@
     "postcss": ">=6"
   },
   "devDependencies": {
+    "actions-up": "^1.14.3",
     "app-root-path": "3.0.0",
+    "beachball": "^2.65.5",
     "clean-webpack-plugin": "3.0.0",
     "commitizen": "4.0.3",
     "css-loader": "3.2.1",
@@ -67,6 +69,21 @@
     "webpack": "4.41.2",
     "webpack-cli": "3.3.10",
     "webpack-plugin-serve": "0.12.1"
+  },
+  "devEngines": {
+    "packageManager": {
+      "name": "pnpm",
+      "version": "11.8.0",
+      "onFail": "download"
+    },
+    "runtime": {
+      "name": "node",
+      "version": ">=24.0.0"
+    }
+  },
+  "packageManager": "pnpm@11.8.0",
+  "engines": {
+    "node": ">=24.0.0"
   },
   "config": {
     "commitizen": {
