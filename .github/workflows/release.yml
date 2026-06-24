@@ -23,7 +23,7 @@ jobs:
           persist-credentials: false
 
       - name: Check if release is needed
-        uses: microsoft/beachball-actions/should-release@v3.0.0
+        uses: microsoft/beachball-actions/should-release@cf7d34819ad50dce8894b3ff99a2a7899aefee3d # v3.1.0
         id: check
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
@@ -40,7 +40,7 @@ jobs:
     steps:
       - name: Generate GitHub token
         id: generate-token
-        uses: actions/create-github-app-token@v1
+        uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3.2.0
         with:
           app-id: ${{ vars.RELEASE_BOT_APP_ID }}
           private-key: ${{ secrets.RELEASE_BOT_PRIVATE_KEY }}
