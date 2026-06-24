@@ -12,7 +12,8 @@
     "start:example": "NODE_ENV=development webpack --progress --config ./example/webpack/webpack.development.config.js",
     "actions:update": "actions-up",
     "changes:generate": "beachball change",
-    "changes:check": "beachball check"
+    "changes:check": "beachball check",
+    "changes:publish": "beachball publish"
   },
   "husky": {
     "hooks": {
