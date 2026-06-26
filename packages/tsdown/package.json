@@ -1,7 +1,8 @@
 {
-  "name": "postcss-responsive-hints",
+  "name": "@postcss-responsive-hints/tsdown",
+  "version": "0.0.0",
   "type": "module",
-  "version": "1.0.0",
+  "private": true,
   "sideEffects": false,
   "files": [
     "dist"
@@ -12,12 +13,7 @@
     "typecheck": "tsc"
   },
   "devDependencies": {
-    "@postcss-responsive-hints/tsconfig": "workspace:*",
-    "@postcss-responsive-hints/tsdown": "workspace:*",
-    "postcss": "^8.5.15"
-  },
-  "peerDependencies": {
-    "postcss": ">=8"
+    "@postcss-responsive-hints/tsconfig": "workspace:*"
   },
   "exports": {
     ".": "./dist/index.js",
