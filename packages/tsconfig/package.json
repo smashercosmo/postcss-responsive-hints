@@ -1,0 +1,10 @@
+{
+  "name": "@postcss-responsive-hints/tsconfig",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./*": "./src/*.json",
+    "./package.json": "./package.json"
+  }
+}
