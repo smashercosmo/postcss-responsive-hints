@@ -41,6 +41,9 @@ jobs:
       # for trusted publishing
       id-token: write
 
+    env:
+      NPM_CONFIG_IGNORE_DEV_ENGINES: true
+
     steps:
       - name: Generate GitHub token
         id: generate-token
