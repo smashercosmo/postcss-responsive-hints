@@ -69,12 +69,23 @@ jobs:
           git config --global user.name "${APP_SLUG}[bot]"
           git config --global user.email "${APP_SLUG}[bot]@users.noreply.github.com"
 
+      # Remove restrictions for a package manager, so we can just use `npm`
+      - name: Strip package manager constraints
+        run: |
+          node -e "
+            const fs = require('fs');
+            const pkg = JSON.parse(fs.readFileSync('package.json', 'utf8'));
+            delete pkg.packageManager;
+            delete pkg.devEngines;
+            fs.writeFileSync('package.json', JSON.stringify(pkg, null, 2));
+          "   
+
       # No tokens needed! npm uses the OIDC identity automatically
       - name: Perform all Beachball chores instead of actual publish
-        run: npm run release --ignore-dev-engines
+        run: npm run release
 
       - name: Publish to npm
-        run: npm stage publish --ignore-dev-engines
+        run: npm stage publish
 
       - name: Generate GitHub release
         env:
