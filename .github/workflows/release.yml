@@ -58,6 +58,9 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
 
+      - name: Install pnpm
+        uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271 # v6.0.9
+
       # Note: We omit lint/test here because the PR branch safely validated them before merge!
 
       - name: Configure Git Identity
@@ -69,26 +72,15 @@ jobs:
           git config --global user.name "${APP_SLUG}[bot]"
           git config --global user.email "${APP_SLUG}[bot]@users.noreply.github.com"
 
-      # Remove restrictions for a package manager, so we can just use `npm`
-      - name: Strip package manager constraints
-        run: |
-          node -e "
-            const fs = require('fs');
-            const pkg = JSON.parse(fs.readFileSync('package.json', 'utf8'));
-            delete pkg.packageManager;
-            delete pkg.devEngines;
-            fs.writeFileSync('package.json', JSON.stringify(pkg, null, 2));
-          "   
-
       - name: Install dependencies
-        run: npm ci
+        run: pnpm ci
 
       - name: Make Beachball perform all the necessary chores instead of actual publish
-        run: npm run beachball:publish
+        run: pnpm beachball:publish
 
       # No tokens needed as we're using Trusted Publishing
       - name: Publish to npm
-        run: npm staged publish
+        run: pnpm staged publish
 
       - name: Generate GitHub release
         env:

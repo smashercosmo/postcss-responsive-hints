@@ -13,7 +13,7 @@
     "beachball:change": "beachball change --scope \"packages/postcss-responsive-hints\"",
     "beachball:check": "beachball check",
     "beachball:publish": "beachball publish --no-publish --scope \"packages/postcss-responsive-hints\"",
-    "prepublishOnly": "turbo run build"
+    "prepublishOnly": "pnpm build"
   },
   "husky": {
     "hooks": {
