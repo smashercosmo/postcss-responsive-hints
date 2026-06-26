@@ -11,7 +11,7 @@
     "actions:update": "actions-up",
     "beachball:change": "beachball change --scope \"packages/postcss-responsive-hints\"",
     "beachball:check": "beachball check",
-    "release": "beachball publish --scope \"packages/postcss-responsive-hints\""
+    "release": "beachball publish --no-publish --scope \"packages/postcss-responsive-hints\""
   },
   "husky": {
     "hooks": {

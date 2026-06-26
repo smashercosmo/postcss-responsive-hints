@@ -75,8 +75,11 @@ jobs:
           git config --global user.email "${APP_SLUG}[bot]@users.noreply.github.com"
 
       # No tokens needed! npm uses the OIDC identity automatically
-      - name: Publish to npm
+      - name: Perform all Beachball chores instead of actual publish
         run: pnpm release
+
+      - name: Publish to npm
+        run: npm stage publish
 
       - name: Generate GitHub release
         env:
