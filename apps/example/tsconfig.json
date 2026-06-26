@@ -1,0 +1,7 @@
+{
+  "extends": "@postcss-responsive-hints/tsconfig/app",
+  "include": ["./src"],
+  "compilerOptions": {
+    "types": ["vite/client"]
+  }
+}
