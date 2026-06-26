@@ -1,7 +1,8 @@
 {
-  "name": "@postcss-responsive-hints/vitest",
-  "private": true,
+  "name": "@postcss-responsive-hints/tsdown",
+  "version": "0.0.0",
   "type": "module",
+  "private": true,
   "sideEffects": false,
   "files": [
     "dist"
@@ -12,12 +13,7 @@
     "typecheck": "tsc"
   },
   "devDependencies": {
-    "@postcss-responsive-hints/tsconfig": "workspace:*",
-    "@postcss-responsive-hints/tsdown": "workspace:*"
-  },
-  "peerDependencies": {
-    "vite": ">=8",
-    "vitest": ">=4"
+    "@postcss-responsive-hints/tsconfig": "workspace:*"
   },
   "exports": {
     ".": "./dist/index.js",

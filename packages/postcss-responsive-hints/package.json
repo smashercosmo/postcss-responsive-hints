@@ -5,5 +5,22 @@
   "sideEffects": false,
   "files": [
     "dist"
-  ]
+  ],
+  "scripts": {
+    "build": "tsdown",
+    "dev": "tsdown --watch",
+    "typecheck": "tsc"
+  },
+  "devDependencies": {
+    "@postcss-responsive-hints/tsconfig": "workspace:*",
+    "@postcss-responsive-hints/tsdown": "workspace:*",
+    "postcss": "^8.5.15"
+  },
+  "peerDependencies": {
+    "postcss": ">=8"
+  },
+  "exports": {
+    ".": "./dist/index.js",
+    "./package.json": "./package.json"
+  }
 }
