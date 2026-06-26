@@ -1,0 +1,22 @@
+{
+  "name": "@postcss-responsive-hints/tsdown",
+  "version": "0.0.0",
+  "type": "module",
+  "private": true,
+  "sideEffects": false,
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsdown",
+    "dev": "tsdown --watch",
+    "typecheck": "tsc"
+  },
+  "devDependencies": {
+    "@postcss-responsive-hints/tsconfig": "workspace:*"
+  },
+  "exports": {
+    ".": "./dist/index.js",
+    "./package.json": "./package.json"
+  }
+}
