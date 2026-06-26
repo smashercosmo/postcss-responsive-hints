@@ -81,5 +81,8 @@
   "packageManager": "pnpm@11.8.0",
   "engines": {
     "node": ">=24.0.0"
+  },
+  "beachball": {
+    "branch": "main"
   }
 }
