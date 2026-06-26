@@ -80,12 +80,15 @@ jobs:
             fs.writeFileSync('package.json', JSON.stringify(pkg, null, 2));
           "   
 
-      # No tokens needed! npm uses the OIDC identity automatically
-      - name: Perform all Beachball chores instead of actual publish
-        run: npm run release
+      - name: Install dependencies
+        run: npm ci
 
+      - name: Make Beachball perform all the necessary chores instead of actual publish
+        run: npm run beachball:publish
+
+      # No tokens needed as we're using Trusted Publishing
       - name: Publish to npm
-        run: npm stage publish
+        run: npm staged publish
 
       - name: Generate GitHub release
         env:

@@ -4,6 +4,7 @@
   "description": "PostCSS plugin that makes it easier to write responsive styles",
   "main": "src/index.js",
   "scripts": {
+    "build": "turbo run build",
     "test": "jest",
     "lint": "eslint './src/**/*.js' './example/**/*.js'",
     "build:example": "NODE_ENV=production webpack --progress --config ./example/webpack/webpack.production.config.js",
@@ -11,7 +12,8 @@
     "actions:update": "actions-up",
     "beachball:change": "beachball change --scope \"packages/postcss-responsive-hints\"",
     "beachball:check": "beachball check",
-    "release": "beachball publish --no-publish --scope \"packages/postcss-responsive-hints\""
+    "beachball:publish": "beachball publish --no-publish --scope \"packages/postcss-responsive-hints\"",
+    "prepublishOnly": "turbo run build"
   },
   "husky": {
     "hooks": {
