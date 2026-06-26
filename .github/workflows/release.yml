@@ -41,9 +41,6 @@ jobs:
       # for trusted publishing
       id-token: write
 
-    env:
-      NPM_CONFIG_IGNORE_DEV_ENGINES: true
-
     steps:
       - name: Generate GitHub token
         id: generate-token
@@ -74,10 +71,10 @@ jobs:
 
       # No tokens needed! npm uses the OIDC identity automatically
       - name: Perform all Beachball chores instead of actual publish
-        run: npm run release
+        run: npm run release --ignore-dev-engines
 
       - name: Publish to npm
-        run: npm stage publish
+        run: npm stage publish --ignore-dev-engines
 
       - name: Generate GitHub release
         env:
