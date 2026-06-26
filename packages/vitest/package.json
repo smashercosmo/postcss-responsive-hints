@@ -1,7 +1,8 @@
 {
-  "name": "postcss-responsive-hints",
+  "name": "@postcss-responsive-hints/vitest",
+  "version": "0.0.0",
+  "private": true,
   "type": "module",
-  "version": "1.0.0",
   "sideEffects": false,
   "files": [
     "dist"
@@ -13,11 +14,11 @@
   },
   "devDependencies": {
     "@postcss-responsive-hints/tsconfig": "workspace:*",
-    "@postcss-responsive-hints/tsdown": "workspace:*",
-    "postcss": "^8.5.15"
+    "@postcss-responsive-hints/tsdown": "workspace:*"
   },
   "peerDependencies": {
-    "postcss": ">=8"
+    "vite": ">=8",
+    "vitest": ">=4"
   },
   "exports": {
     ".": "./dist/index.js",
