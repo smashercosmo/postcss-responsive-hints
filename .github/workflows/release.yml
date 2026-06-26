@@ -76,7 +76,7 @@ jobs:
 
       # No tokens needed! npm uses the OIDC identity automatically
       - name: Publish to npm
-        run: pnpm changes:publish --yes
+        run: pnpm beachball:publish --yes
 
       - name: Generate GitHub release
         env:
