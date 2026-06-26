@@ -1,0 +1,9 @@
+{
+  "name": "postcss-responsive-hints",
+  "type": "module",
+  "version": "1.0.0",
+  "sideEffects": false,
+  "files": [
+    "dist"
+  ]
+}
