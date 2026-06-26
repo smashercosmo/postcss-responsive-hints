@@ -76,7 +76,7 @@ jobs:
         run: pnpm ci
 
       - name: Make Beachball perform all the necessary chores instead of actual publish
-        run: pnpm beachball:publish
+        run: pnpm release
 
       # No tokens needed as we're using Trusted Publishing
       - name: Publish to npm

@@ -12,7 +12,7 @@
     "actions:update": "actions-up",
     "beachball:change": "beachball change --scope \"packages/postcss-responsive-hints\"",
     "beachball:check": "beachball check",
-    "beachball:publish": "beachball publish --no-publish --scope \"packages/postcss-responsive-hints\"",
+    "release": "beachball publish --no-publish --scope \"packages/postcss-responsive-hints\"",
     "prepublishOnly": "pnpm build"
   },
   "husky": {
