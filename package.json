@@ -10,8 +10,8 @@
     "start:example": "NODE_ENV=development webpack --progress --config ./example/webpack/webpack.development.config.js",
     "actions:update": "actions-up",
     "beachball:change": "beachball change --scope \"packages/postcss-responsive-hints\"",
-    "beachball:publish": "beachball publish --scope \"packages/postcss-responsive-hints\"",
-    "beachball:check": "beachball check"
+    "beachball:check": "beachball check",
+    "release": "beachball publish --scope \"packages/postcss-responsive-hints\""
   },
   "husky": {
     "hooks": {
