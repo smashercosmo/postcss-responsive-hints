@@ -29,4 +29,4 @@ jobs:
         run: pnpm ci
 
       - name: Verify Beachball change files exist
-        run: pnpm changes:check
+        run: pnpm beachball:check
