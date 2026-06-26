@@ -37,6 +37,9 @@ jobs:
     if: ${{ needs.prerelease.outputs.shouldRelease == 'yes' }}
     runs-on: ubuntu-latest
     environment: release
+    permissions:
+      # for trusted publishing
+      id-token: write
 
     steps:
       - name: Generate GitHub token
