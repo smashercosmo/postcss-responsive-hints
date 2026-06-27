@@ -1,18 +1,16 @@
 {
-  "name": "root",
-  "type": "module",
+  "private": true,
   "description": "PostCSS plugin that makes it easier to write responsive styles",
   "scripts": {
-    "build": "turbo run build",
-    "dev": "turbo run dev",
-    "test": "turbo run test",
+    "build": "turbo build",
+    "dev": "turbo dev",
+    "test": "turbo test",
     "actions:update": "actions-up",
-    "beachball:change": "beachball change",
     "beachball:change": "beachball change",
     "beachball:check": "beachball check",
     "release": "beachball publish --no-publish",
-    "prepublishOnly": "pnpm build",
-    "clean": "find . -type d \\( -name \"node_modules\" -o -name \"dist\" -o -name \".turbo\" \\) -prune -exec rm -rf {} +"
+    "prepublishOnly": "turbo build",
+    "clean": "turbo clean && rm -rf node_modules && rm -rf .turbo"
   },
   "repository": {
     "type": "git",
@@ -54,8 +52,5 @@
   "packageManager": "pnpm@11.8.0",
   "engines": {
     "node": ">=24.0.0"
-  },
-  "beachball": {
-    "branch": "main"
   }
 }

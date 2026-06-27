@@ -1,5 +1,6 @@
 {
   "name": "@postcss-responsive-hints/vitest",
+  "version": "1.0,0",
   "private": true,
   "type": "module",
   "sideEffects": false,
@@ -9,7 +10,8 @@
   "scripts": {
     "build": "tsdown",
     "dev": "tsdown --watch",
-    "typecheck": "tsc"
+    "typecheck": "tsc",
+    "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist"
   },
   "devDependencies": {
     "@postcss-responsive-hints/tsconfig": "workspace:*",
