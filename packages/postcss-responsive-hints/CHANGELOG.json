@@ -1,0 +1,20 @@
+{
+  "name": "postcss-responsive-hints",
+  "entries": [
+    {
+      "date": "Sat, 27 Jun 2026 04:07:45 GMT",
+      "version": "2.0.0",
+      "tag": "postcss-responsive-hints_v2.0.0",
+      "comments": {
+        "major": [
+          {
+            "author": "smashercosmo@gmail.com",
+            "package": "postcss-responsive-hints",
+            "commit": "e1ddd46b7e78a612fc3c6e6fd2b2558b65cf0e7d",
+            "comment": "chore: transform to monorepo"
+          }
+        ]
+      }
+    }
+  ]
+}
