@@ -28,11 +28,5 @@ jobs:
       - name: Install dependencies
         run: pnpm ci
 
-      - name: Run linter
-        run: pnpm lint
-
-      - name: Run tests
-        run: pnpm test
-
       - name: Verify Beachball change files exist
-        run: pnpm changes:check
+        run: pnpm beachball:check

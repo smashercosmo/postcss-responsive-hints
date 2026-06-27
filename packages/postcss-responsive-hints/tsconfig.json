@@ -1,0 +1,4 @@
+{
+  "extends": "@postcss-responsive-hints/tsconfig/lib",
+  "include": ["./src"]
+}

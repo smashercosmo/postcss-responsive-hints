@@ -1,0 +1,7 @@
+{
+  "type": "major",
+  "comment": "chore: transform to monorepo",
+  "packageName": "postcss-responsive-hints",
+  "email": "smashercosmo@gmail.com",
+  "dependentChangeType": "patch"
+}
