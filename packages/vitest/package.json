@@ -1,0 +1,9 @@
+{
+  "name": "@postcss-responsive-hints/vitest",
+  "type": "module",
+  "private": true,
+  "sideEffects": false,
+  "files": [
+    "dist"
+  ]
+}

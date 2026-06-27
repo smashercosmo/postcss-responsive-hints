@@ -10,9 +10,9 @@
     "build:example": "NODE_ENV=production webpack --progress --config ./example/webpack/webpack.production.config.js",
     "start:example": "NODE_ENV=development webpack --progress --config ./example/webpack/webpack.development.config.js",
     "actions:update": "actions-up",
-    "beachball:change": "beachball change --scope \"packages/postcss-responsive-hints\"",
+    "beachball:change": "beachball change",
     "beachball:check": "beachball check",
-    "release": "beachball publish --no-publish --scope \"packages/postcss-responsive-hints\"",
+    "release": "beachball publish --no-publish",
     "prepublishOnly": "pnpm build"
   },
   "husky": {

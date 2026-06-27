@@ -1,0 +1,9 @@
+{
+  "name": "@postcss-responsive-hints/example",
+  "type": "module",
+  "private": true,
+  "sideEffects": false,
+  "files": [
+    "dist"
+  ]
+}
