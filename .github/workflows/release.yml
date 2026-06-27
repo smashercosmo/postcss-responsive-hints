@@ -81,7 +81,7 @@ jobs:
 
       # No tokens needed as we're using Trusted Publishing
       - name: Publish to npm
-        run: pnpm staged publish
+        run: pnpm stage publish
 
       - name: Generate GitHub release
         env:
