@@ -1,6 +1,6 @@
 {
   "name": "@postcss-responsive-hints/tsdown",
-  "version": "1.0,0",
+  "version": "1.0.0",
   "type": "module",
   "private": true,
   "sideEffects": false,

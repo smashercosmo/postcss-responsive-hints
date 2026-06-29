@@ -8,7 +8,7 @@ module.exports = {
   groups: [
     {
       name: "all-packages",
-      include: ["packages/*", "apps/*"], // adjusts to match your directory layout
+      include: ["packages/*", "apps/*"],
       kind: "synchronized",
       mainPackageName: "postcss-responsive-hints",
       changelogPath: "./"
