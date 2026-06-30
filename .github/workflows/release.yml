@@ -82,14 +82,3 @@ jobs:
       # No tokens needed as we're using Trusted Publishing
       - name: Publish to npm
         run: pnpm stage publish -r --no-git-checks
-
-      - name: Generate GitHub release
-        env:
-          GITHUB_TOKEN: ${{ steps.generate-token.outputs.token }}
-        run: |
-          LATEST_TAG=$(git describe --tags --abbrev=0)
-          echo "Generating GitHub release for $LATEST_TAG..."
-
-          gh release create "$LATEST_TAG" \
-            --title "Release $LATEST_TAG" \
-            --generate-notes
