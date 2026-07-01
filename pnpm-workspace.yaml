@@ -1,5 +1,15 @@
-allowBuilds:
-  core-js: true
-  fsevents: true
-  husky: true
-  unrs-resolver: true
+packages:
+  - packages/*
+  - apps/*
+
+catalogs:
+  dev:
+    vite: 8.1.0
+    vitest: 4.1.9
+    tsdown: 0.22.3
+    typescript: 6.0.3
+  types:
+    "@types/node": 24.0.0
+  tools:
+    actions-up: 1.14.3
+    turbo: 2.10.0
