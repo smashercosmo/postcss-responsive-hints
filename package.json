@@ -5,7 +5,7 @@
     "build": "turbo build",
     "dev": "turbo dev",
     "test": "turbo test",
-    "ci:publish": "pnpm -r exec -- npm publish --access public && changeset tag",
+    "ci:publish": "pnpm --filter postcss-responsive-hints publish --no-git-checks && changeset tag",
     "ci:version": "changeset version && pnpm ci",
     "actions:update": "actions-up",
     "clean": "turbo clean && rm -rf node_modules && rm -rf .turbo"
