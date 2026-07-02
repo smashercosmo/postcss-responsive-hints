@@ -56,10 +56,12 @@ jobs:
         id: changesets
         uses: changesets/action@v1
         with:
-          version: pnpm changeset version
-          publish: pnpm changeset publish
-          commit: "chore: version packages"
-          title: "chore: version packages"
+          version: pnpm ci:version
+          commit: 'chore: update versions'
+          title: 'chore: update versions'
+          # https://github.com/changesets/action/issues/246
+          # https://github.com/changesets/changesets/pull/674
+          publish: pnpm ci:publish
           createGithubReleases: true
         env:
           GITHUB_TOKEN: ${{ steps.generate-token.outputs.token }}
