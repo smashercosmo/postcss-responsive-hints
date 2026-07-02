@@ -49,7 +49,7 @@ jobs:
         run: pnpm build
 
       - name: Install latest npm
-        run: npm install -g npm@latest
+        run: sudo npm install -g npm@latest
 
       # If there are pending changesets, this opens/updates a
       # "Version Packages" PR (bumps versions, writes changelogs) and stops.
