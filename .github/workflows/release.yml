@@ -62,7 +62,7 @@ jobs:
           title: 'chore: update versions'
           # https://github.com/changesets/action/issues/246
           # https://github.com/changesets/changesets/pull/674
-          publish: pnpm ci:publish
+          publish: npx changeset publish
           createGithubReleases: true
         env:
           GITHUB_TOKEN: ${{ steps.generate-token.outputs.token }}
