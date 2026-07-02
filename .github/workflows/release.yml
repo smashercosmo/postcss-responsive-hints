@@ -48,6 +48,9 @@ jobs:
       - name: Build
         run: pnpm build
 
+      - name: Install latest npm
+        run: npm install -g npm@latest
+
       # If there are pending changesets, this opens/updates a
       # "Version Packages" PR (bumps versions, writes changelogs) and stops.
       # Once that PR is merged, this same job runs again, finds no pending
