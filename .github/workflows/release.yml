@@ -17,20 +17,14 @@ jobs:
     permissions:
       # for trusted publishing
       id-token: write
+      contents: write
+      pull-requests: write
 
     steps:
-      - name: Generate GitHub token
-        id: generate-token
-        uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3.2.0
-        with:
-          client-id: ${{ vars.RELEASE_BOT_CLIENT_ID }}
-          private-key: ${{ secrets.RELEASE_BOT_PRIVATE_KEY }}
-
       - name: Checkout repository
         uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
         with:
           fetch-depth: 0
-          token: ${{ steps.generate-token.outputs.token }}
           persist-credentials: false
 
       - name: Install pnpm
@@ -58,4 +52,4 @@ jobs:
           publish: pnpm changeset publish
           createGithubReleases: true
         env:
-          GITHUB_TOKEN: ${{ steps.generate-token.outputs.token }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
