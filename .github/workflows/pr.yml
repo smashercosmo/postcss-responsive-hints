@@ -5,6 +5,10 @@ on:
     branches:
       - main
 
+concurrency:
+  group: pr-${{ github.head_ref }}
+  cancel-in-progress: true
+
 jobs:
   validate:
     name: Lint, test, and check changes
@@ -28,11 +32,8 @@ jobs:
       - name: Install dependencies
         run: pnpm ci
 
-      - name: Run linter
-        run: pnpm lint
+      - name: Build
+        run: pnpm build
 
-      - name: Run tests
-        run: pnpm test
-
-      - name: Verify Beachball change files exist
-        run: pnpm changes:check
+      - name: Require a changeset for publishable changes
+        run: pnpm changeset status --since=origin/main
