@@ -5,7 +5,7 @@
     "build": "turbo build",
     "dev": "turbo dev",
     "test": "turbo test",
-    "ci:publish": "npm publish ./packages/postcss-responsive-hints --access public && changeset tag",
+    "ci:publish": "changeset publish",
     "ci:version": "changeset version && pnpm ci",
     "actions:update": "actions-up",
     "clean": "turbo clean && rm -rf node_modules && rm -rf .turbo"
