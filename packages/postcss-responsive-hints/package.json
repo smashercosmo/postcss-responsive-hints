@@ -8,7 +8,8 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/smashercosmo/postcss-responsive-hints.git"
+    "url": "git+https://github.com/smashercosmo/postcss-responsive-hints.git",
+    "directory": "packages/postcss-responsive-hints"
   },
   "scripts": {
     "build": "tsdown",
