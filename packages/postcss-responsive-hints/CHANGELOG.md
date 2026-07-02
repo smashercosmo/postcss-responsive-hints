@@ -1,5 +1,11 @@
 # postcss-responsive-hints
 
+## 2.0.1
+
+### Patch Changes
+
+- be3167b: Simplify release workflow
+
 ## 2.0.0
 
 ### Major Changes
