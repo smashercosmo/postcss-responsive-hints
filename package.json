@@ -9,10 +9,6 @@
     "prepublishOnly": "turbo build",
     "clean": "turbo clean && rm -rf node_modules && rm -rf .turbo"
   },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/smashercosmo/postcss-responsive-hints.git"
-  },
   "keywords": [
     "postcss",
     "postcss-plugin"

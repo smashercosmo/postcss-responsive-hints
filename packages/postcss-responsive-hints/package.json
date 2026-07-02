@@ -6,6 +6,10 @@
   "files": [
     "dist"
   ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/smashercosmo/postcss-responsive-hints.git"
+  },
   "scripts": {
     "build": "tsdown",
     "dev": "tsdown --watch",
