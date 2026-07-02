@@ -1,5 +1,11 @@
 # postcss-responsive-hints
 
+## 2.0.2
+
+### Patch Changes
+
+- e1fa045: Simplify release workflow even more
+
 ## 2.0.1
 
 ### Patch Changes
