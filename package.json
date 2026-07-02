@@ -5,7 +5,6 @@
     "build": "turbo build",
     "dev": "turbo dev",
     "test": "turbo test",
-    "ci:publish": "changeset publish",
     "ci:version": "changeset version && pnpm ci",
     "actions:update": "actions-up",
     "clean": "turbo clean && rm -rf node_modules && rm -rf .turbo"
@@ -32,8 +31,14 @@
     "typescript": "catalog:dev",
     "vitest": "catalog:dev"
   },
+  "devEngines": {
+    "runtime": {
+      "name": "node",
+      "version": ">=24.0.0"
+    }
+  },
   "packageManager": "pnpm@11.8.0",
   "engines": {
-    "node": ">=22.23.0"
+    "node": ">=24.0.0"
   }
 }
