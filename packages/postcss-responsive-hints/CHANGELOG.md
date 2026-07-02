@@ -1,0 +1,9 @@
+# postcss-responsive-hints
+
+## 2.0.0
+
+### Major Changes
+
+- fc68766: - Modernize postcss-responsive-hints plugin code
+  - Migrate to monorepo project structure
+  - BREAKING CHANGE: lowest supported postcss version is now 8
