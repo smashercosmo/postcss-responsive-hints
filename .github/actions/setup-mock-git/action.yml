@@ -1,0 +1,42 @@
+name: Setup mock git
+description: Sets up mock git repo for testing changesets
+
+runs:
+  using: composite
+  steps:
+    - name: Upgrade Node matching package.json (act-only)
+      shell: bash
+      run: |
+        # Remove any existing git trace inside the container's temporary view
+        rm -rf .git
+        
+        # 1. Initialize your fake remote first
+        mkdir -p /tmp/mock_git_repo.git
+        cd /tmp/mock_git_repo.git
+        git init --bare
+             
+        # 2. Go back to your project directory     
+        cd -
+        
+        # 3. Initialize your local repo and link it to the fake remote
+        git init -b main
+        git config user.email "test@test.com"
+        git config user.name "John Doe"
+        git remote add origin /tmp/mock_git_repo.git
+        
+        # 4. Commit initial state and push it to the "remote" main
+        git commit -m "initial commit" --allow-empty
+        git push origin main
+        
+        # 5. Setup your local feature branch
+        git checkout -b feature-branch
+
+        # 6. Commit the changes locally on the feature branch
+        git commit -m "make changes" --allow-empty
+        
+        # 7. Generate changeset
+        pnpm changeset init
+        pnpm changeset add -m 'Changes description' --empty
+        
+        # 8. Fetch origin so changesets can see origin/main exists
+        git fetch origin main

@@ -1,0 +1,44 @@
+name: Setup node
+description: Sets up Node natively on GitHub or upgrades it dynamically inside act
+
+runs:
+  using: composite
+  steps:
+    # 1. RUNS ONLY ON GITHUB: Standard clean installation from scratch
+    - name: Setup Node.js (GitHub)
+      if: ${{ !env.ACT }}
+      uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
+      with:
+        cache: pnpm
+        node-version-file: package.json
+
+    # 2. RUNS ONLY IN ACT: Upgrade the container node version matching package.json
+    - name: Upgrade Node matching package.json (act-only)
+      if: ${{ env.ACT }}
+      shell: bash
+      run: |
+        # Install jq to parse package configurations safely
+        apt-get update && apt-get install -y jq
+
+        # Find target node engine from packages directory or root
+        if [ -f "package.json" ]; then
+          TARGET_NODE_VERSION=$(jq -r '.devEngines.runtime.vesion' package.json | tr -d '^>=<~')
+        else
+          TARGET_NODE_VERSION=$(jq -r '.devEngines.runtime.vesion' package.json | tr -d '^>=<~')
+        fi
+
+        if [ "$TARGET_NODE_VERSION" = "null" ] || [ -z "$TARGET_NODE_VERSION" ]; then
+          echo "⚠️ No node engine specified. Defaulting to LTS."
+          TARGET_NODE_VERSION="lts"
+        fi
+
+        echo "🚀 Found target Node version: $TARGET_NODE_VERSION"
+
+        # Install 'n' and upgrade Node directly as root inside Docker
+        pnpm install -g n
+        n $TARGET_NODE_VERSION
+
+        # Clear the Linux command path cache so the new version is tracked immediately
+        hash -r
+        echo "✅ Upgraded local act container Node runtime to:"
+        node -v
