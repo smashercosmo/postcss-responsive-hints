@@ -1,11 +1,7 @@
 {
-  "name": "@postcss-responsive-hints/root",
+  "name": "root",
   "version": "0.0.0",
   "private": true,
-  "workspaces": [
-    "packages/*",
-    "apps/*"
-  ],
   "description": "PostCSS plugin that makes it easier to write responsive styles",
   "scripts": {
     "build": "turbo build",
