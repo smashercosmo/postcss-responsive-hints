@@ -10,6 +10,9 @@
       "cache": false,
       "persistent": true
     },
+    "test": {
+      "dependsOn": ["^test", "@postcss-responsive-hints/vitest#build"]
+    },
     "clean": {
       "cache": false
     }

@@ -1,10 +1,17 @@
 {
+  "name": "root",
+  "version": "0.0.0",
   "private": true,
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
   "description": "PostCSS plugin that makes it easier to write responsive styles",
   "scripts": {
     "build": "turbo build",
     "dev": "turbo dev",
     "test": "turbo test",
+    "test:project": "f() { vitest run --project=\"$1\"; }; f",
     "ci:version": "changeset version && pnpm ci",
     "actions:update": "actions-up",
     "clean": "turbo clean && rm -rf node_modules && rm -rf .turbo"
@@ -24,6 +31,9 @@
   },
   "devDependencies": {
     "@changesets/cli": "^2.31.0",
+    "@pshevche/act-test-runner": "^1.0.2",
+    "@postcss-responsive-hints/vitest": "workspace:*",
+    "@postcss-responsive-hints/tsconfig": "workspace:*",
     "@types/node": "catalog:types",
     "actions-up": "catalog:tools",
     "tsdown": "catalog:dev",
@@ -32,6 +42,11 @@
     "vitest": "catalog:dev"
   },
   "devEngines": {
+    "packageManager": {
+      "name": "pnpm",
+      "version": "11.8.0",
+      "onFail": "download"
+    },
     "runtime": {
       "name": "node",
       "version": ">=24.0.0"

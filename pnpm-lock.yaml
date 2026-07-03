@@ -211,6 +211,9 @@ catalogs:
     typescript:
       specifier: 6.0.3
       version: 6.0.3
+    vite:
+      specifier: 8.1.0
+      version: 8.1.0
     vitest:
       specifier: 4.1.9
       version: 4.1.9
@@ -237,6 +240,15 @@ importers:
       '@changesets/cli':
         specifier: ^2.31.0
         version: 2.31.0(@types/node@24.0.0)
+      '@postcss-responsive-hints/tsconfig':
+        specifier: workspace:*
+        version: link:packages/tsconfig
+      '@postcss-responsive-hints/vitest':
+        specifier: workspace:*
+        version: link:packages/vitest
+      '@pshevche/act-test-runner':
+        specifier: ^1.0.2
+        version: 1.0.2(typescript@6.0.3)
       '@types/node':
         specifier: catalog:types
         version: 24.0.0
@@ -443,6 +455,11 @@ packages:
 
   '@oxc-project/types@0.137.0':
     resolution: {integrity: sha512-WT+Gb24i8hmvo85AIv2oEYouEXkRlKAlT9WaCa3TfLgNCN+GhrJOGZuIlMouAh38Qe4QOx26eUOVsq70qXrywA==}
+
+  '@pshevche/act-test-runner@1.0.2':
+    resolution: {integrity: sha512-AwOHqcbuCmKtUS15JT3RL1HF7YXtzvAMbarIvGxuP1U4ROuR9BRXucqdUqJMXOb4ox2IknmAuvybu/FWzFrE9g==}
+    peerDependencies:
+      typescript: ^5
 
   '@quansync/fs@1.0.0':
     resolution: {integrity: sha512-4TJ3DFtlf1L5LDMaM6CanJ/0lckGNtJcMjQ1NAV6zDmA0tEHKZtxNKin8EgPaVX1YzljbxckyT2tJrpQKAtngQ==}
@@ -1551,6 +1568,10 @@ snapshots:
       fastq: 1.20.1
 
   '@oxc-project/types@0.137.0': {}
+
+  '@pshevche/act-test-runner@1.0.2(typescript@6.0.3)':
+    dependencies:
+      typescript: 6.0.3
 
   '@quansync/fs@1.0.0':
     dependencies:
