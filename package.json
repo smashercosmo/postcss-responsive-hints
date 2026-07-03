@@ -4,9 +4,9 @@
   "private": true,
   "description": "PostCSS plugin that makes it easier to write responsive styles",
   "scripts": {
-    "build": "turbo build",
-    "dev": "turbo dev",
-    "test": "turbo test",
+    "build": "turbo build --filter=!root",
+    "dev": "turbo dev --filter=!root",
+    "test": "turbo test --filter=!root",
     "test:project": "f() { vitest run --project=\"$1\"; }; f",
     "ci:version": "changeset version && pnpm ci",
     "actions:update": "actions-up",
@@ -41,7 +41,7 @@
     "packageManager": {
       "name": "pnpm",
       "version": "11.8.0",
-      "onFail": "download"
+      "onFail": "warn"
     },
     "runtime": {
       "name": "node",

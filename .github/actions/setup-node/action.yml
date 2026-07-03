@@ -35,7 +35,7 @@ runs:
         echo "🚀 Found target Node version: $TARGET_NODE_VERSION"
 
         # Install 'n' and upgrade Node directly as root inside Docker
-        npm install -g n
+        pnpm install -g n
         n $TARGET_NODE_VERSION
 
         # Clear the Linux command path cache so the new version is tracked immediately
