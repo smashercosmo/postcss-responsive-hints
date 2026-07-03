@@ -1,6 +1,6 @@
 {
   "name": "root",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "private": true,
   "description": "PostCSS plugin that makes it easier to write responsive styles",
   "scripts": {
