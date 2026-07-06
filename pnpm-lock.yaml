@@ -19,9 +19,18 @@ catalogs:
       specifier: 4.1.9
       version: 4.1.9
   tools:
+    '@changesets/cli':
+      specifier: 2.31.0
+      version: 2.31.0
+    '@pshevche/act-test-runner':
+      specifier: 1.0.2
+      version: 1.0.2
     actions-up:
       specifier: 1.14.3
       version: 1.14.3
+    clean-publish:
+      specifier: 7.1.0
+      version: 7.1.0
     turbo:
       specifier: 2.10.0
       version: 2.10.0
@@ -39,7 +48,7 @@ importers:
         version: 8.5.16
     devDependencies:
       '@changesets/cli':
-        specifier: ^2.31.0
+        specifier: catalog:tools
         version: 2.31.0(@types/node@24.0.0)
       '@postcss-responsive-hints/tsconfig':
         specifier: workspace:*
@@ -48,7 +57,7 @@ importers:
         specifier: workspace:*
         version: link:packages/vitest
       '@pshevche/act-test-runner':
-        specifier: ^1.0.2
+        specifier: catalog:tools
         version: 1.0.2(typescript@6.0.3)
       '@types/node':
         specifier: catalog:types
@@ -57,7 +66,7 @@ importers:
         specifier: catalog:tools
         version: 1.14.3
       clean-publish:
-        specifier: ^7.1.0
+        specifier: catalog:tools
         version: 7.1.0
       tsdown:
         specifier: catalog:dev

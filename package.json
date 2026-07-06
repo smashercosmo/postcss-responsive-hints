@@ -26,13 +26,13 @@
     "postcss": ">=8"
   },
   "devDependencies": {
-    "@changesets/cli": "^2.31.0",
+    "@changesets/cli": "catalog:tools",
     "@postcss-responsive-hints/tsconfig": "workspace:*",
     "@postcss-responsive-hints/vitest": "workspace:*",
-    "@pshevche/act-test-runner": "^1.0.2",
+    "@pshevche/act-test-runner": "catalog:tools",
     "@types/node": "catalog:types",
     "actions-up": "catalog:tools",
-    "clean-publish": "^7.1.0",
+    "clean-publish": "catalog:tools",
     "tsdown": "catalog:dev",
     "turbo": "catalog:tools",
     "typescript": "catalog:dev",
