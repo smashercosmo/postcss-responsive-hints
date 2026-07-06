@@ -13,10 +13,6 @@
   },
   "scripts": {
     "build": "rm -rf dist && mkdir dist && cp -r src/ dist/",
-    "postbuild": "rm -rf ./package && clean-publish",
     "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist && rm -rf package"
-  },
-  "publishConfig": {
-    "directory": "package"
   }
 }
