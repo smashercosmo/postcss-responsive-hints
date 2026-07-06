@@ -1,0 +1,6 @@
+{
+  "withoutPublish": true,
+  "tempDir": "package",
+  "packageManager": "pnpm",
+  "files": ["src", ".turbo", "tsconfig.json", "tsdown.config.ts"]
+}

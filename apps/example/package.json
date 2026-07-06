@@ -4,15 +4,24 @@
   "version": "0.0.0",
   "private": true,
   "sideEffects": false,
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/smashercosmo/postcss-responsive-hints.git",
+    "directory": "app/example"
+  },
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
     "preview": "vite preview",
-    "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist"
+    "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist && rm -rf package",
+    "postbuild": "rm -rf ./package && clean-publish"
   },
   "devDependencies": {
     "vite": "catalog:dev",
     "postcss-responsive-hints": "workspace:*",
     "@postcss-responsive-hints/tsconfig": "workspace:*"
+  },
+  "publishConfig": {
+    "directory": "package"
   }
 }

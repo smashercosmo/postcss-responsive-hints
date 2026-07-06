@@ -2,9 +2,21 @@
   "name": "@postcss-responsive-hints/tsconfig",
   "version": "0.0.0",
   "private": true,
+  "sideEffects": false,
   "type": "module",
+  "files": [
+    "dist"
+  ],
   "exports": {
-    "./*": "./src/*.json",
+    "./*": "./dist/*.json",
     "./package.json": "./package.json"
+  },
+  "scripts": {
+    "build": "rm -rf dist && mkdir dist && cp -r src/ dist/",
+    "postbuild": "rm -rf ./package && clean-publish",
+    "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist && rm -rf package"
+  },
+  "publishConfig": {
+    "directory": "package"
   }
 }

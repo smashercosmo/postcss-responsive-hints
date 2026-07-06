@@ -11,7 +11,8 @@
     "build": "tsdown",
     "dev": "tsdown --watch",
     "typecheck": "tsc",
-    "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist"
+    "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist && rm -rf package",
+    "postbuild": "rm -rf ./package && clean-publish"
   },
   "devDependencies": {
     "@postcss-responsive-hints/tsconfig": "workspace:*",
@@ -24,5 +25,8 @@
   "exports": {
     ".": "./dist/index.js",
     "./package.json": "./package.json"
+  },
+  "publishConfig": {
+    "directory": "package"
   }
 }
