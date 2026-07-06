@@ -43,10 +43,10 @@ importers:
         version: 2.31.0(@types/node@24.0.0)
       '@postcss-responsive-hints/tsconfig':
         specifier: workspace:*
-        version: link:packages/tsconfig/package
+        version: link:packages/tsconfig
       '@postcss-responsive-hints/vitest':
         specifier: workspace:*
-        version: link:packages/vitest/package
+        version: link:packages/vitest
       '@pshevche/act-test-runner':
         specifier: ^1.0.2
         version: 1.0.2(typescript@6.0.3)
@@ -76,37 +76,33 @@ importers:
     devDependencies:
       '@postcss-responsive-hints/tsconfig':
         specifier: workspace:*
-        version: link:../../packages/tsconfig/package
+        version: link:../../packages/tsconfig
       postcss-responsive-hints:
         specifier: workspace:*
-        version: link:../../packages/postcss-responsive-hints/package
+        version: link:../../packages/postcss-responsive-hints
       vite:
         specifier: catalog:dev
         version: 8.1.0(@types/node@24.0.0)(yaml@2.9.0)
-    publishDirectory: package
 
   packages/postcss-responsive-hints:
     devDependencies:
       '@postcss-responsive-hints/tsconfig':
         specifier: workspace:*
-        version: link:../tsconfig/package
+        version: link:../tsconfig
       '@postcss-responsive-hints/tsdown':
         specifier: workspace:*
-        version: link:../tsdown/package
+        version: link:../tsdown
       postcss:
         specifier: ^8.5.15
         version: 8.5.16
-    publishDirectory: package
 
-  packages/tsconfig:
-    publishDirectory: package
+  packages/tsconfig: {}
 
   packages/tsdown:
     devDependencies:
       '@postcss-responsive-hints/tsconfig':
         specifier: workspace:*
-        version: link:../tsconfig/package
-    publishDirectory: package
+        version: link:../tsconfig
 
   packages/vitest:
     dependencies:
@@ -119,11 +115,10 @@ importers:
     devDependencies:
       '@postcss-responsive-hints/tsconfig':
         specifier: workspace:*
-        version: link:../tsconfig/package
+        version: link:../tsconfig
       '@postcss-responsive-hints/tsdown':
         specifier: workspace:*
-        version: link:../tsdown/package
-    publishDirectory: package
+        version: link:../tsdown
 
 packages:
 
