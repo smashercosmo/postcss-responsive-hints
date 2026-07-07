@@ -140,10 +140,7 @@ jobs:
 
       - name: Publish tarballs
         run: |
-          cd ${{ steps.download.outputs.download-path }}
-          echo "--- Debug: Printing contents of tarballs/ ---"
-          ls -R
-          echo "--------------------------------------------"
+          cd ${{ steps.download.outputs.download-path }}/packages
           for tgz in *.tgz; do
             pnpm stage publish "$tgz" --no-git-checks --access public --provenance
           done
