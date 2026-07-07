@@ -141,7 +141,7 @@ jobs:
         run: |
           cd tarballs
           for tgz in *.tgz; do
-            pnpm publish "$tgz" --no-git-checks --access public --provenance
+            pnpm stage publish "$tgz" --no-git-checks --access public --provenance
           done
 
       - name: Create tags and GitHub release
