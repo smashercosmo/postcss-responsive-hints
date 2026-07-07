@@ -140,9 +140,8 @@ jobs:
 
       - name: Publish tarballs
         run: |
-          cd tarballs
+          cd ${{ steps.download.outputs.download-path }}
           echo "--- Debug: Printing contents of tarballs/ ---"
-          echo "${{ steps.download.outputs.download-path }}"
           ls -R
           echo "--------------------------------------------"
           for tgz in *.tgz; do
