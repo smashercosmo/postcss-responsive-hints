@@ -1,5 +1,11 @@
 # postcss-responsive-hints
 
+## 2.0.3
+
+### Patch Changes
+
+- 0e1b241: dev dependencies updated
+
 ## 2.0.2
 
 ### Patch Changes
