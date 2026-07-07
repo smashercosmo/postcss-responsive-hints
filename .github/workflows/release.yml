@@ -135,6 +135,7 @@ jobs:
         id: download
         with:
           name: release-tarballs
+          pattern: tarballs/**/*.tgz
           path: tarballs/
 
       - name: Publish tarballs
