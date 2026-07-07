@@ -139,8 +139,9 @@ jobs:
 
       - name: Publish tarballs
         run: |
-          for tgz in ${{ steps.download.outputs.download-path }}/*.tgz; do
-            pnpm stage publish "$tgz" --no-git-checks --access public --provenance
+          cd tarballs
+          for tgz in *.tgz; do
+            pnpm publish "$tgz" --no-git-checks --access public --provenance
           done
 
       - name: Create tags and GitHub release
