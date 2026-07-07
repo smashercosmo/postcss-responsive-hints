@@ -142,6 +142,7 @@ jobs:
         run: |
           cd tarballs
           echo "--- Debug: Printing contents of tarballs/ ---"
+          echo "${{ steps.download.outputs.download-path }}"
           ls -R
           echo "--------------------------------------------"
           for tgz in *.tgz; do
