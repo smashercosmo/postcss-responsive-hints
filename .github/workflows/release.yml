@@ -159,7 +159,11 @@ jobs:
         run: |
           cd ${{ steps.download.outputs.download-path }}/packages
           for tgz in *.tgz; do
-            pnpm stage publish "$tgz" --no-git-checks --access public --provenance
+            pnpm publish "$tgz" \
+              --no-git-checks \
+              --access public \
+              --provenance \
+              || echo ":::warning:::️ Version might already exist on npm. Skipping."
           done
 
       - name: Create tags and GitHub release
