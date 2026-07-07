@@ -140,6 +140,9 @@ jobs:
       - name: Publish tarballs
         run: |
           cd tarballs
+          echo "--- Debug: Printing contents of tarballs/ ---"
+          ls -R
+          echo "--------------------------------------------"
           for tgz in *.tgz; do
             pnpm stage publish "$tgz" --no-git-checks --access public --provenance
           done
