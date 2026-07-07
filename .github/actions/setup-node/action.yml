@@ -13,32 +13,7 @@ runs:
         node-version-file: package.json
 
     # 2. RUNS ONLY IN ACT: Upgrade the container node version matching package.json
-    - name: Upgrade Node matching package.json (act-only)
+    - name: Setup Node.js (Act)
       if: ${{ env.ACT }}
       shell: bash
-      run: |
-        # Install jq to parse package configurations safely
-        apt-get update && apt-get install -y jq
-
-        # Find target node engine from packages directory or root
-        if [ -f "package.json" ]; then
-          TARGET_NODE_VERSION=$(jq -r '.devEngines.runtime.vesion' package.json | tr -d '^>=<~')
-        else
-          TARGET_NODE_VERSION=$(jq -r '.devEngines.runtime.vesion' package.json | tr -d '^>=<~')
-        fi
-
-        if [ "$TARGET_NODE_VERSION" = "null" ] || [ -z "$TARGET_NODE_VERSION" ]; then
-          echo "⚠️ No node engine specified. Defaulting to LTS."
-          TARGET_NODE_VERSION="lts"
-        fi
-
-        echo "🚀 Found target Node version: $TARGET_NODE_VERSION"
-
-        # Install 'n' and upgrade Node directly as root inside Docker
-        pnpm install -g n
-        n $TARGET_NODE_VERSION
-
-        # Clear the Linux command path cache so the new version is tracked immediately
-        hash -r
-        echo "✅ Upgraded local act container Node runtime to:"
-        node -v
+      run: .github/scripts/update-node-in-act-container-to-match-the-one-specified-in-package-json.sh

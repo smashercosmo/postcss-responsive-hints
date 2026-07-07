@@ -1,6 +1,8 @@
+.DS_Store
 node_modules
 dist
 package
+.pnpm-store
 .idea
 .turbo
 *.tsbuildinfo

@@ -1,6 +1,6 @@
 {
   "pull_request": {
-    "head": { "ref": "feature-branch" },
+    "head": { "ref": "act-mock-changesets" },
     "base": { "ref": "main" }
   }
 }

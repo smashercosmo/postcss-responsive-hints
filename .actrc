@@ -1,0 +1,5 @@
+--cache-server-path=/tmp/act-cache
+--cache-server-addr=localhost
+--cache-server-port=0
+--action-offline-mode
+--use-gitignore

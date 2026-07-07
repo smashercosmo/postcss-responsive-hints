@@ -28,9 +28,5 @@
   "exports": {
     ".": "./dist/index.js",
     "./package.json": "./package.json"
-  },
-  "publishConfig": {
-    "access": "public",
-    "provenance": true
   }
 }

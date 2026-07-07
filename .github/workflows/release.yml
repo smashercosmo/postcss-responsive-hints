@@ -1,25 +1,22 @@
-name: Run checks and release
+name: Release
 
 on:
   push:
     branches:
       - main
 
-concurrency:
-  group: release-${{ github.ref }}
-  cancel-in-progress: false
+concurrency: ${{ github.workflow }}-${{ github.ref }}
 
 jobs:
-  release:
-    name: Release
+  version-and-pack:
     runs-on: ubuntu-latest
-    environment: release
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     permissions:
-      # for trusted publishing
-      id-token: write
       contents: write
       pull-requests: write
-
+    outputs:
+      has_changesets: ${{ steps.check.outputs.has_changesets }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
@@ -30,26 +27,96 @@ jobs:
       - name: Install pnpm
         uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271 # v6.0.9
 
-      - name: Setup Node.js
-        uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
-        with:
-          node-version-file: 'package.json'
-          cache: pnpm
+      - name: Setup node
+        uses: ./.github/actions/setup-node
 
       - name: Install dependencies
         run: pnpm ci
 
-      - name: Build
-        run: pnpm build
-
-      - name: Create Version Packages PR or publish to npm
-        id: changesets
-        uses: changesets/action@a45c4d594aa4e2c509dc14a9f2b3b67ba3780d0d # v1.9.0
-        with:
-          version: pnpm ci:version
-          commit: 'chore: update versions'
-          title: 'chore: update versions'
-          publish: pnpm changeset publish
-          createGithubReleases: true
+      - name: Add mock changeset
+        if: >
+          env.ACT == 'true' &&
+          startsWith(github.event.head_commit.message, 'docs(changeset): Changes description')
+        shell: bash
+        run: .github/scripts/add-mock-changeset.sh
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          MERGE_TO_MAIN: "true"
+
+      - name: Simulate release PR merge
+        if: >
+          env.ACT == 'true' &&
+          startsWith(github.event.head_commit.message, 'chore: version packages')
+        shell: bash
+        run: |
+          .github/scripts/add-mock-changeset.sh
+          .github/scripts/version-packages.sh
+          .github/scripts/simulate-release-pr-merge.sh
+        env:
+          MERGE_TO_MAIN: "true"
+
+      - name: Check for pending changesets
+        id: check
+        shell: bash
+        run: .github/scripts/check-for-pending-changesets.sh
+
+      # --- Case A: pending changesets -> open/update version PR, stop here ---
+      - name: Version packages
+        if: steps.check.outputs.has_changesets == 'true'
+        shell: bash
+        run: .github/scripts/version-packages.sh
+
+      - name: Create/update release PR
+        if: steps.check.outputs.has_changesets == 'true'
+        shell: bash
+        run: .github/scripts/create-update-release-pr.sh
+
+      # --- Case B: no pending changesets -> pack tarballs ---
+      - name: Compute publish plan
+        if: steps.check.outputs.has_changesets == 'false'
+        run: pnpm changeset publish-plan --output=publish-plan.json
+
+      - name: Pack tarballs from plan
+        if: steps.check.outputs.has_changesets == 'false'
+        run: pnpm changeset pack --from-publish-plan=publish-plan.json --out-dir tarballs
+
+      # Doesn't work with act until this is resolved https://github.com/nektos/act/issues/6114
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        if: steps.check.outputs.has_changesets == 'false' && env.ACT != 'true'
+        with:
+          name: release-tarballs
+          path: tarballs/**/*.tgz
+
+  publish:
+    needs: version-and-pack
+    if: needs.version-and-pack.outputs.has_changesets == 'false'
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write   # if using npm provenance
+      contents: write   # for git tags
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          persist-credentials: false
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271 # v6.0.9
+
+      - name: Setup node
+        uses: ./.github/actions/setup-node
+
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: release-tarballs
+          path: tarballs/
+
+      - name: Publish tarballs
+        run: |
+          for tgz in tarballs/*.tgz; do
+            pnpm stage publish "$tgz" --no-git-checks --access public --provenance
+          done
+
+      - name: Create tags and GitHub release
+        run: .github/scripts/create-tags-and-github-release.sh
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

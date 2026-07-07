@@ -33,6 +33,7 @@
     "@types/node": "catalog:types",
     "actions-up": "catalog:tools",
     "clean-publish": "catalog:tools",
+    "oxfmt": "catalog:tools",
     "tsdown": "catalog:dev",
     "turbo": "catalog:tools",
     "typescript": "catalog:dev",

@@ -17,3 +17,4 @@ catalogs:
     "@changesets/cli": 3.0.0-next.6
     "@pshevche/act-test-runner": 1.0.2
     clean-publish: 7.1.0
+    oxfmt: 0.57.0
