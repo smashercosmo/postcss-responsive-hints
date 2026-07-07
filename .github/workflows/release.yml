@@ -9,6 +9,7 @@ concurrency: ${{ github.workflow }}-${{ github.ref }}
 
 jobs:
   version-and-pack:
+    environment: release
     runs-on: ubuntu-latest
     permissions:
       id-token: write
@@ -108,6 +109,7 @@ jobs:
       needs.version-and-pack.outputs.has_changesets == 'false' &&
       needs.version-and-pack.outputs.artifact_created == 'true'
     runs-on: ubuntu-latest
+    environment: release
     permissions:
       id-token: write
     steps:
