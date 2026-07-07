@@ -24,6 +24,13 @@ jobs:
           client-id: ${{ vars.RELEASE_BOT_CLIENT_ID }}
           private-key: ${{ secrets.RELEASE_BOT_PRIVATE_KEY }}
 
+      - name: Checkout repository
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          fetch-depth: 0
+          token: ${{ steps.generate-token.outputs.token }}
+          persist-credentials: false
+
       - name: Configure Git Identity
         env:
           APP_SLUG: ${{ steps.generate-token.outputs.app-slug }}
@@ -31,13 +38,7 @@ jobs:
           git config --global user.name "${APP_SLUG}[bot]"
           git config --global user.email "${APP_SLUG}[bot]@users.noreply.github.com"
           git remote set-url origin "https://x-access-token:${{ steps.generate-token.outputs.token }}@github.com/smashercosmo/postcss-responsive-hints"   
-
-      - name: Checkout repository
-        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
-        with:
-          fetch-depth: 0
-          token: ${{ steps.generate-token.outputs.token }}
-          persist-credentials: false
+          
 
       - name: Install pnpm
         uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271 # v6.0.9
@@ -122,19 +123,19 @@ jobs:
           client-id: ${{ vars.RELEASE_BOT_CLIENT_ID }}
           private-key: ${{ secrets.RELEASE_BOT_PRIVATE_KEY }}
 
+      - name: Checkout repository
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          token: ${{ steps.generate-token.outputs.token }}
+          persist-credentials: false
+
       - name: Configure Git Identity
         env:
           APP_SLUG: ${{ steps.generate-token.outputs.app-slug }}
         run: |
           git config --global user.name "${APP_SLUG}[bot]"
           git config --global user.email "${APP_SLUG}[bot]@users.noreply.github.com"
-          git remote set-url origin "https://x-access-token:${{ steps.generate-token.outputs.token }}@github.com/smashercosmo/postcss-responsive-hints"   
-
-      - name: Checkout repository
-        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
-        with:
-          token: ${{ steps.generate-token.outputs.token }}
-          persist-credentials: false
+          git remote set-url origin "https://x-access-token:${{ steps.generate-token.outputs.token }}@github.com/smashercosmo/postcss-responsive-hints" 
 
       - name: Install pnpm
         uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271 # v6.0.9
