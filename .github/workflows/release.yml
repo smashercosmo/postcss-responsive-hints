@@ -10,19 +10,30 @@ concurrency: ${{ github.workflow }}-${{ github.ref }}
 jobs:
   version-and-pack:
     runs-on: ubuntu-latest
-    env:
-      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     permissions:
-      contents: write
-      pull-requests: write
+      id-token: write
     outputs:
       has_changesets: ${{ steps.check.outputs.has_changesets }}
       artifact_created: ${{ steps.upload.outputs.artifact-id != '' }}
     steps:
+      - name: Generate GitHub token
+        id: generate-token
+        uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3.2.0
+        with:
+          client-id: ${{ vars.RELEASE_BOT_CLIENT_ID }}
+          private-key: ${{ secrets.RELEASE_BOT_PRIVATE_KEY }}
+
+      - name: Configure Git
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git remote set-url origin https://x-access-token:${{ steps.generate-token.outputs.token }}@github.com/${{ github.repository }}.git    
+
       - name: Checkout repository
         uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
         with:
           fetch-depth: 0
+          token: ${{ steps.generate-token.outputs.token }}
           persist-credentials: false
 
       - name: Install pnpm
@@ -98,12 +109,25 @@ jobs:
       needs.version-and-pack.outputs.artifact_created == 'true'
     runs-on: ubuntu-latest
     permissions:
-      id-token: write # if using npm provenance
-      contents: write # for git tags
+      id-token: write
     steps:
+      - name: Generate GitHub token
+        id: generate-token
+        uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3.2.0
+        with:
+          client-id: ${{ vars.RELEASE_BOT_CLIENT_ID }}
+          private-key: ${{ secrets.RELEASE_BOT_PRIVATE_KEY }}
+
+      - name: Configure Git
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git remote set-url origin https://x-access-token:${{ steps.generate-token.outputs.token }}@github.com/${{ github.repository }}.git    
+
       - name: Checkout repository
         uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
         with:
+          token: ${{ steps.generate-token.outputs.token }}
           persist-credentials: false
 
       - name: Install pnpm
@@ -125,5 +149,3 @@ jobs:
 
       - name: Create tags and GitHub release
         run: .github/scripts/create-tags-and-github-release.sh
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
