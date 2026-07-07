@@ -159,7 +159,7 @@ jobs:
         run: |
           cd ${{ steps.download.outputs.download-path }}/packages
           for tgz in *.tgz; do
-            pnpm publish "$tgz" \
+            pnpm stage publish "$tgz" \
               --no-git-checks \
               --access public \
               --provenance \
