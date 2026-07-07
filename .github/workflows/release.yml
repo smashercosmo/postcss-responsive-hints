@@ -24,11 +24,13 @@ jobs:
           client-id: ${{ vars.RELEASE_BOT_CLIENT_ID }}
           private-key: ${{ secrets.RELEASE_BOT_PRIVATE_KEY }}
 
-      - name: Configure Git
+      - name: Configure Git Identity
+        env:
+          APP_SLUG: ${{ steps.generate-token.outputs.app-slug }}
         run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git remote set-url origin https://x-access-token:${{ steps.generate-token.outputs.token }}@github.com/${{ github.repository }}.git    
+          git config --global user.name "${APP_SLUG}[bot]"
+          git config --global user.email "${APP_SLUG}[bot]@users.noreply.github.com"
+          git remote set-url origin "https://x-access-token:${{ steps.generate-token.outputs.token }}@github.com/smashercosmo/postcss-responsive-hints"   
 
       - name: Checkout repository
         uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
@@ -120,11 +122,13 @@ jobs:
           client-id: ${{ vars.RELEASE_BOT_CLIENT_ID }}
           private-key: ${{ secrets.RELEASE_BOT_PRIVATE_KEY }}
 
-      - name: Configure Git
+      - name: Configure Git Identity
+        env:
+          APP_SLUG: ${{ steps.generate-token.outputs.app-slug }}
         run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git remote set-url origin https://x-access-token:${{ steps.generate-token.outputs.token }}@github.com/${{ github.repository }}.git    
+          git config --global user.name "${APP_SLUG}[bot]"
+          git config --global user.email "${APP_SLUG}[bot]@users.noreply.github.com"
+          git remote set-url origin "https://x-access-token:${{ steps.generate-token.outputs.token }}@github.com/smashercosmo/postcss-responsive-hints"   
 
       - name: Checkout repository
         uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
