@@ -85,6 +85,8 @@ jobs:
         if: steps.check.outputs.has_changesets == 'true'
         shell: bash
         run: .github/scripts/create-update-release-pr.sh
+        env:
+          GH_TOKEN: ${{ steps.generate-token.outputs.token }}
 
       # --- Case B: no pending changesets -> pack tarballs ---
       - name: Compute publish plan
