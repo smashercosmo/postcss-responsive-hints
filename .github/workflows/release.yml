@@ -17,6 +17,7 @@ jobs:
       pull-requests: write
     outputs:
       has_changesets: ${{ steps.check.outputs.has_changesets }}
+      artifact_created: ${{ steps.upload.outputs.artifact-id != '' }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
@@ -80,19 +81,25 @@ jobs:
         run: pnpm changeset pack --from-publish-plan=publish-plan.json --out-dir tarballs
 
       # Doesn't work with act until this is resolved https://github.com/nektos/act/issues/6114
-      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        id: upload
         if: steps.check.outputs.has_changesets == 'false' && env.ACT != 'true'
         with:
           name: release-tarballs
           path: tarballs/**/*.tgz
+          retention-days: 1
+          if-no-files-found: ignore
 
   publish:
     needs: version-and-pack
-    if: needs.version-and-pack.outputs.has_changesets == 'false'
+    if: >
+      needs.version-and-pack.outputs.has_changesets == 'false' &&
+      needs.version-and-pack.outputs.artifact_created == 'true'
     runs-on: ubuntu-latest
     permissions:
-      id-token: write   # if using npm provenance
-      contents: write   # for git tags
+      id-token: write # if using npm provenance
+      contents: write # for git tags
     steps:
       - name: Checkout repository
         uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
