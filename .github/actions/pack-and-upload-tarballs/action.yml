@@ -1,6 +1,11 @@
 name: Tarballs
 description: Pack and upload tarballs
 
+outputs:
+  artifact-id:
+    description: Have tarballs been uploaded
+    value: ${{ steps.upload.outputs.artifact-id }}
+
 runs:
   using: composite
   steps:

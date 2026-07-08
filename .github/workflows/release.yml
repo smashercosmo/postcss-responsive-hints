@@ -20,14 +20,14 @@ on:
 concurrency: ${{ github.workflow }}-${{ github.ref }}
 
 jobs:
-  version-and-pack:
+  version-and-pack-and-upload:
     environment: release
     runs-on: ubuntu-latest
     permissions:
       contents: read
     outputs:
       has_changesets: ${{ steps.check.outputs.has_changesets }}
-      artifact_created: ${{ steps.upload.outputs.artifact-id != '' }}
+      artifact_created: ${{ steps.pack_and_upload.outputs.artifact-id != '' }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
@@ -75,14 +75,15 @@ jobs:
 
       # --- Case B: no pending changesets -> pack and upload tarballs ---
       - name: Pack and upload tarballs
+        id: pack_and_upload
         if: steps.check.outputs.has_changesets == 'false'
         uses: ./.github/actions/pack-and-upload-tarballs
 
   publish:
-    needs: version-and-pack
+    needs: version-and-pack-and-upload
     if: >
-      needs.version-and-pack.outputs.has_changesets == 'false' &&
-      needs.version-and-pack.outputs.artifact_created == 'true'
+      needs.version-and-pack-and-upload.outputs.has_changesets == 'false' &&
+      needs.version-and-pack-and-upload.outputs.artifact_created == 'true'
     runs-on: ubuntu-latest
     environment: release
     permissions:
