@@ -4,7 +4,7 @@ cd tarballs
 jq -r '.plan[][] | [.name, .version, .tarball.path] | @tsv' publish-plan.json | \
 while IFS=$'\t' read -r name version tarball_path; do
   echo "::notice:: Publishing $name@$version"
-  pnpm publish "$tarball_path" \
+  pnpm stage publish "$tarball_path" \
   --no-git-checks \
   --access public \
   --provenance
