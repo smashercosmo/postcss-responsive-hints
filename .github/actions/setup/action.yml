@@ -1,5 +1,5 @@
 name: Setup project
-description: Checkout, install pnpm, setup Node, install dependencies
+description: Generate GitHub token, configure GIT, install pnpm, setup Node, install dependencies
 
 inputs:
   client-id:
@@ -20,12 +20,6 @@ outputs:
 runs:
   using: composite
   steps:
-    - name: Checkout repository
-      uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
-      with:
-        fetch-depth: 0
-        persist-credentials: false
-
     - name: Generate GitHub token
       id: generate-token
       uses: ./.github/actions/generate-token

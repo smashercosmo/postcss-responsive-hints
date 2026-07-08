@@ -36,13 +36,11 @@ echo "::notice:: Found target Node version: $TARGET_NODE_VERSION"
 # Install 'n' and upgrade Node directly as root inside Docker
 pnpm install -g n
 
-set +o nounset
+# Override global SHELLOPTS env,
+# otherwise `n` command fails
 set +o errexit
-set +o pipefail
 n $TARGET_NODE_VERSION
-set -o nounset
 set -o errexit
-set -o pipefail
 
 # Clear the Linux command path cache so the new version is tracked immediately
 hash -r
