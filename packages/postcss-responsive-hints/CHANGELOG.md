@@ -1,5 +1,11 @@
 # postcss-responsive-hints
 
+## 2.0.5
+
+### Patch Changes
+
+- 1d53b10: Get tarballs paths from publish-plan.json
+
 ## 2.0.4
 
 ### Patch Changes
