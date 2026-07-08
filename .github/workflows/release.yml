@@ -36,7 +36,7 @@ jobs:
 
       - name: Setup
         id: setup
-        uses: ./.github/actions/setup
+        uses: .github/actions/setup
         with:
           client-id: ${{ vars.RELEASE_BOT_CLIENT_ID }}
           private-key: ${{ secrets.RELEASE_BOT_PRIVATE_KEY }}
@@ -66,36 +66,17 @@ jobs:
         id: check
         run: .github/scripts/check-for-pending-changesets.sh
 
-      # --- Case A: pending changesets -> open/update version PR, stop here ---
-      - name: Version packages
+      # --- Case A: pending changesets -> create release PR, stop here ---
+      - name: Create release PR
         if: steps.check.outputs.has_changesets == 'true'
-        run: .github/scripts/version-packages.sh
-        env: ${{ fromJSON(steps.setup.outputs.git_env_config) }}
-
-      - name: Create/update release PR
-        if: steps.check.outputs.has_changesets == 'true'
-        run: .github/scripts/create-update-release-pr.sh
-        env: ${{ fromJSON(steps.setup.outputs.git_env_config) }}
-
-      # --- Case B: no pending changesets -> pack tarballs ---
-      - name: Compute publish plan
-        if: steps.check.outputs.has_changesets == 'false'
-        run: pnpm changeset publish-plan --output=publish-plan.json
-
-      - name: Pack tarballs from plan
-        if: steps.check.outputs.has_changesets == 'false'
-        run: pnpm changeset pack --from-publish-plan=publish-plan.json --out-dir tarballs
-
-      # Doesn't work with act until this is resolved https://github.com/nektos/act/issues/6114
-      - name: Upload build artifacts
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
-        id: upload
-        if: steps.check.outputs.has_changesets == 'false' && env.ACT != 'true'
+        uses: .github/actions/create-release-pr
         with:
-          name: release-tarballs
-          path: tarballs/**/*.tgz
-          retention-days: 1
-          if-no-files-found: ignore
+          git_env_config: ${{ steps.setup.outputs.git_env_config }}
+
+      # --- Case B: no pending changesets -> pack and upload tarballs ---
+      - name: Pack and upload tarballs
+        if: steps.check.outputs.has_changesets == 'false'
+        uses: .github/actions/pack-and-upload-tarballs
 
   publish:
     needs: version-and-pack
@@ -115,7 +96,7 @@ jobs:
 
       - name: Setup
         id: setup
-        uses: ./.github/actions/setup
+        uses: .github/actions/setup
         with:
           client-id: ${{ vars.RELEASE_BOT_CLIENT_ID }}
           private-key: ${{ secrets.RELEASE_BOT_PRIVATE_KEY }}
@@ -125,18 +106,10 @@ jobs:
         id: download
         with:
           name: release-tarballs
-          pattern: tarballs/**/*.tgz
           path: tarballs/
 
       - name: Publish tarballs
-        run: |
-          cd ${{ steps.download.outputs.download-path }}/packages
-          for tgz in *.tgz; do
-            pnpm stage publish "$tgz" \
-              --no-git-checks \
-              --access public \
-              --provenance
-          done
+        run: .github/scripts/publish-tarballs.sh
 
       - name: Create tags and GitHub release
         run: .github/scripts/create-tags-and-github-release.sh
