@@ -39,7 +39,7 @@ runs:
       shell: bash
       run: .github/scripts/configure-git-identity.sh
       env:
-        TOKEN: ${{ steps.generate-token.outputs.token }}
+        GH_TOKEN: ${{ steps.generate-token.outputs.token }}
         APP_SLUG: ${{ steps.generate-token.outputs.app-slug }}
 
     - name: Install pnpm

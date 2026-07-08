@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 
-: "${APP_SLUG:?APP_SLUG is required}" "${TOKEN:?TOKEN is required}"
+: "${APP_SLUG:?APP_SLUG is required}" "${GH_TOKEN:?GH_TOKEN is required}"
 
-BASIC_AUTH=$(printf "x-access-token:%s" "$TOKEN" | base64)
+BASIC_AUTH=$(printf "x-access-token:%s" "$GH_TOKEN" | base64)
 app_user="$APP_SLUG[bot]"
 app_id="$(gh api "/users/$app_user" --jq .id)"
 
