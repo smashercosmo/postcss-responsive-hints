@@ -27,6 +27,7 @@
   },
   "devDependencies": {
     "@changesets/cli": "catalog:tools",
+    "@changesets/types": "^6.1.0",
     "@postcss-responsive-hints/tsconfig": "workspace:*",
     "@postcss-responsive-hints/vitest": "workspace:*",
     "@pshevche/act-test-runner": "catalog:tools",

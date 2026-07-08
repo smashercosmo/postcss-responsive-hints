@@ -252,6 +252,9 @@ importers:
       '@changesets/cli':
         specifier: catalog:tools
         version: 3.0.0-next.6
+      '@changesets/types':
+        specifier: ^6.1.0
+        version: 6.1.0
       '@postcss-responsive-hints/tsconfig':
         specifier: workspace:*
         version: link:packages/tsconfig
@@ -409,6 +412,9 @@ packages:
   '@changesets/should-skip-package@1.0.0-next.6':
     resolution: {integrity: sha512-2y4+DMh7gMMEQaGwKwJMY7cixmJrK7u7rSZQ9t5O+xwqty9qXhO9EKbIeMDlt13A1Bdxuiu7ptkMKC+AoOO28Q==}
     engines: {node: ^22.11 || ^24 || >=26}
+
+  '@changesets/types@6.1.0':
+    resolution: {integrity: sha512-rKQcJ+o1nKNgeoYRHKOS07tAMNd3YSN0uHaJOZYjBAgxfV7TUE7JE+z4BzZdQwb5hKaYbayKN5KrYV7ODb2rAA==}
 
   '@changesets/types@7.0.0-next.6':
     resolution: {integrity: sha512-bdxuVLYKrCt14kNFb+ltta8pOPFmQWB0DpMcz9IWMD+DRupQ4+wZyCkXIkfIoqu3iN0fcQkSuoZ2tNOfV+fepg==}
@@ -1453,6 +1459,8 @@ snapshots:
   '@changesets/should-skip-package@1.0.0-next.6':
     dependencies:
       '@changesets/types': 7.0.0-next.6
+
+  '@changesets/types@6.1.0': {}
 
   '@changesets/types@7.0.0-next.6': {}
 
