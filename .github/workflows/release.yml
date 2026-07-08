@@ -163,7 +163,6 @@ jobs:
               --no-git-checks \
               --access public \
               --provenance \
-              || echo ":::warning:::️ Version might already exist on npm. Skipping."
           done
 
       - name: Create tags and GitHub release
