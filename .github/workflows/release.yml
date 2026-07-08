@@ -37,6 +37,7 @@ jobs:
           persist-credentials: false
 
       - name: Setup
+        id: setup
         uses: ./.github/actions/setup
         with:
           client-id: ${{ vars.RELEASE_BOT_CLIENT_ID }}
