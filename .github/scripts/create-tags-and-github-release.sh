@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 
 # 1. Let changesets generate local tags for the new versions
-pnpm changeset tag
+# (as we just need @changeset/cli package, we're not doing full-fledged `pnpm i`)
+pnx @changeset/cli@catalog:tools tag
 
 # 2. Push the new tags to the remote
 git push origin --tags

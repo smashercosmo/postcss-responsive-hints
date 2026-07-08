@@ -32,7 +32,7 @@ describe("PR check workflow", () => {
   it("should successfully run the feature PR workflow", async () => {
     const result = await new ActRunner()
       .withEvent("pull_request")
-      .withAdditionalArgs("--eventpath", join(fixturesDir, "./events/feature-pr-event.json"))
+      .withAdditionalArgs("--eventpath", join(fixturesDir, "./events/changes-pr-event.json"))
       .withWorkflowBody(workflowBody)
       .forwardOutput()
       .run();
@@ -60,7 +60,7 @@ describe("PR check workflow", () => {
   it("should successfully run the changeset-release PR workflow", async () => {
     const result = await new ActRunner()
     .withEvent("pull_request")
-    .withAdditionalArgs("--eventpath", join(fixturesDir, "./events/changeset-release-pr-event.json"))
+    .withAdditionalArgs("--eventpath", join(fixturesDir, "./events/release-pr-event.json"))
     .withWorkflowBody(workflowBody)
     .forwardOutput()
     .run();

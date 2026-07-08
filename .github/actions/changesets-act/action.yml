@@ -1,0 +1,26 @@
+name: Steps for ACT environment
+description: Emulate "add", "version" changesets commands and release PR merge
+
+runs:
+  using: composite
+  steps:
+    - name: Add mock changeset
+      if: >
+        env.ACT == 'true' &&
+        startsWith(github.event.head_commit.message, 'docs(changeset): Changes description')
+      shell: bash
+      run: .github/scripts/simulate-changes-pr-merge.sh
+      env:
+        MERGE_TO_MAIN: "true"
+
+    - name: Simulate release PR merge
+      if: >
+        env.ACT == 'true' &&
+        startsWith(github.event.head_commit.message, 'chore: version packages')
+      shell: bash
+      run: |
+        .github/scripts/add-mock-changeset.sh
+        .github/scripts/version-packages.sh
+        .github/scripts/simulate-release-pr-merge.sh
+      env:
+        MERGE_TO_MAIN: "true"

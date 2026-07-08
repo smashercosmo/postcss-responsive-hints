@@ -1,3 +1,4 @@
+-P custom-act-image
 --cache-server-path=/tmp/act-cache
 --cache-server-addr=localhost
 --cache-server-port=0

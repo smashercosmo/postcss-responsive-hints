@@ -78,3 +78,9 @@ Example:
 - Write better docs
 - Write tests
 - Make semantic-release work
+
+## Local github workflow testing
+
+- Install [Docker](https://www.docker.com/products/docker-desktop/)
+- Install [Act](https://nektosact.com/installation/index.html)
+- Run `docker build -t custom-act-image .` (to make jq and mocked GitHub CLI available in container)
