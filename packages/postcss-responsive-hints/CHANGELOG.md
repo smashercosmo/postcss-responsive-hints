@@ -1,5 +1,11 @@
 # postcss-responsive-hints
 
+## 2.0.4
+
+### Patch Changes
+
+- fd94cb7: Customize changesets commit messages
+
 ## 2.0.3
 
 ### Patch Changes
