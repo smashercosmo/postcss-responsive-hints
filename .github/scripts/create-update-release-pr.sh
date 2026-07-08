@@ -19,6 +19,10 @@ if [ -z "$PR_NUMBER" ]; then
   gh pr create --base main --head $BRANCH_NAME \
     --title "$PR_TITLE" \
     --body "$PR_BODY"
+
+  # Force a synchronize event, since 'opened' via API is unreliable for triggering
+  git commit --allow-empty -m "chore: trigger PR checks"
+  git push origin $BRANCH_NAME --force
 else
   echo "::notice:: Updating existing PR #$PR_NUMBER..."
   gh pr edit $PR_NUMBER --title "$PR_TITLE" --body "$PR_BODY"
