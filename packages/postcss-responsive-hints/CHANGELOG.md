@@ -1,5 +1,11 @@
 # postcss-responsive-hints
 
+## 2.0.4
+
+### Patch Changes
+
+- c09c164: GitHub actions refactoring
+
 ## 2.0.3
 
 ### Patch Changes
