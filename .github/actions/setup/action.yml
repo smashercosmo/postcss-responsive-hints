@@ -22,6 +22,9 @@ outputs:
   app-slug:
     description: GitHub App slug
     value: ${{ steps.generate-token.outputs.app-slug }}
+  git_env_config:
+    description: "JSON string containing all Git environment configuration variables"
+    value: ${{ steps.git-identity.outputs.git_env_config }}
 
 runs:
   using: composite
@@ -36,6 +39,7 @@ runs:
         permission-pull-requests: ${{ inputs.permission-pull-requests }}
 
     - name: Configure Git Identity
+      id: git-identity
       shell: bash
       run: .github/scripts/configure-git-identity.sh
       env:

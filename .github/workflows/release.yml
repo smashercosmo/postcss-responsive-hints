@@ -70,12 +70,12 @@ jobs:
       - name: Version packages
         if: steps.check.outputs.has_changesets == 'true'
         run: .github/scripts/version-packages.sh
+        env: ${{ fromJSON(steps.setup.outputs.git_env_config) }}
 
       - name: Create/update release PR
         if: steps.check.outputs.has_changesets == 'true'
         run: .github/scripts/create-update-release-pr.sh
-        env:
-          GH_TOKEN: ${{ steps.setup.outputs.token }}
+        env: ${{ fromJSON(steps.setup.outputs.git_env_config) }}
 
       # --- Case B: no pending changesets -> pack tarballs ---
       - name: Compute publish plan
@@ -140,5 +140,4 @@ jobs:
 
       - name: Create tags and GitHub release
         run: .github/scripts/create-tags-and-github-release.sh
-        env:
-          GH_TOKEN: ${{ steps.setup.outputs.token }}
+        env: ${{ fromJSON(steps.setup.outputs.git_env_config) }}
