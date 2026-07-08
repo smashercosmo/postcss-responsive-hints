@@ -1,9 +1,5 @@
 #!/usr/bin/env bash
 
-set -o errexit
-set -o nounset
-set -o pipefail
-
 # Install jq to parse package configurations safely
 # --yes tells the package manager to automatically answer "yes" to any confirmation prompts
 apt-get update && apt-get install --yes jq
@@ -41,8 +37,12 @@ echo "::notice:: Found target Node version: $TARGET_NODE_VERSION"
 pnpm install -g n
 
 set +o nounset
+set +o errexit
+set +o pipefail
 n $TARGET_NODE_VERSION
 set -o nounset
+set -o errexit
+set -o pipefail
 
 # Clear the Linux command path cache so the new version is tracked immediately
 hash -r
