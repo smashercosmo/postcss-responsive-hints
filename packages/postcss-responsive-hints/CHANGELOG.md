@@ -1,5 +1,11 @@
 # postcss-responsive-hints
 
+## 2.0.6
+
+### Patch Changes
+
+- 5b1857f: improve configure-git-identity.sh script
+
 ## 2.0.5
 
 ### Patch Changes
