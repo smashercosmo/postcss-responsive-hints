@@ -35,6 +35,9 @@ jobs:
       - name: Generate GitHub token
         id: generate-token
         uses: ./.github/actions/generate-token
+        with:
+          client-id: ${{ vars.RELEASE_BOT_CLIENT_ID }}
+          private-key: ${{ secrets.RELEASE_BOT_PRIVATE_KEY }}
 
       - name: Configure Git Identity
         run: .github/scripts/configure-git-identity.sh

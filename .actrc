@@ -3,3 +3,5 @@
 --cache-server-port=0
 --action-offline-mode
 --use-gitignore
+--var RELEASE_BOT_CLIENT_ID=some-client-id
+--secret RELEASE_BOT_PRIVATE_KEY=some-private-key
