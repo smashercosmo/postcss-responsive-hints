@@ -24,6 +24,7 @@ on:
 jobs:
   validate:
     name: Lint, test, and check changes
+    environment: release
     runs-on: ubuntu-latest
     permissions:
       contents: read
