@@ -5,12 +5,10 @@ const { getAddMessage, getVersionMessage } = commitFunctions;
 
 const functions: CommitFunctions = {
   async getAddMessage(...args) {
-    const msg = getAddMessage(...args);
-    return msg;
+    return getAddMessage(...args);
   },
   async getVersionMessage(...args) {
-    const msg = getVersionMessage(...args);
-    return msg;
+    return getVersionMessage(...args);
   },
 };
 

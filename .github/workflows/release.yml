@@ -135,7 +135,7 @@ jobs:
             pnpm stage publish "$tgz" \
               --no-git-checks \
               --access public \
-              --provenance \
+              --provenance
           done
 
       - name: Create tags and GitHub release
