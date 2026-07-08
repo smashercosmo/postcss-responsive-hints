@@ -1,22 +1,33 @@
 name: PR check
 
-on:
-  pull_request:
-    branches:
-      - main
+env:
+  # errexit - exit immediately if any command fails
+  # nounset - error on use of undefined variables
+  # pipefail - pipeline fails if any command in it fails, not just the last one
+  SHELLOPTS: errexit:nounset:pipefail
+
+defaults:
+  run:
+    shell: bash
+
+permissions: {}
 
 concurrency:
   group: pr-${{ github.head_ref }}
   cancel-in-progress: true
 
+on:
+  pull_request:
+    branches:
+      - main
+
 jobs:
   validate:
     name: Lint, test, and check changes
+    environment: release
     runs-on: ubuntu-latest
     permissions:
-      contents: write
-      pull-requests: write
-
+      contents: read
     steps:
       - name: Checkout repository
         uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
@@ -24,31 +35,17 @@ jobs:
           fetch-depth: 0
           persist-credentials: false
 
-      - name: Install pnpm
-        uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271 # v6.0.9
+      - name: Setup
+        uses: ./.github/actions/setup
         with:
-          cache: true
-
-      - name: Setup node
-        uses: ./.github/actions/setup-node
-
-      - name: Install dependencies
-        run: pnpm ci
+          client-id: ${{ vars.RELEASE_BOT_CLIENT_ID }}
+          private-key: ${{ secrets.RELEASE_BOT_PRIVATE_KEY }}
 
       - name: Add mock changeset (ACT)
-        if: env.ACT && github.head_ref != 'changeset-release/main'
-        shell: bash
+        if: env.ACT == 'true' && github.head_ref != 'changeset-release/main'
         run: .github/scripts/add-mock-changeset.sh
 
       - name: Require a changeset for publishable changes
-        if: github.head_ref != 'changeset-release/main'
-        shell: bash
         run: .github/scripts/get-changeset-status.sh
-
-      - name: Check if this is changeset-release/main PR
-        if: github.head_ref == 'changeset-release/main'
-        shell: bash
-        run: |
-          echo '```json' >> "$GITHUB_STEP_SUMMARY"
-          echo '{ "github": { "head_ref": "changeset-release/main" } }' >> "$GITHUB_STEP_SUMMARY"
-          echo '```' >> "$GITHUB_STEP_SUMMARY"
+        env:
+          HEAD_REF: ${{ github.head_ref }}

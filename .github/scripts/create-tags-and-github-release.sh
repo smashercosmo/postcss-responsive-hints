@@ -1,9 +1,5 @@
 #!/usr/bin/env bash
 
-set -o errexit    # exit immediately if any command fails
-set -o nounset    # error on use of undefined variables
-set -o pipefail   # a pipeline fails if any command in it fails, not just the last one
-
 # 1. Let changesets generate local tags for the new versions
 pnpm changeset tag
 

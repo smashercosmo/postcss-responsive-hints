@@ -1,9 +1,5 @@
 #!/usr/bin/env bash
 
-set -o errexit    # exit immediately if any command fails
-set -o nounset    # error on use of undefined variables
-set -o pipefail   # a pipeline fails if any command in it fails, not just the last one
-
 # Install jq to parse package configurations safely
 # --yes tells the package manager to automatically answer "yes" to any confirmation prompts
 apt-get update && apt-get install --yes jq
@@ -39,7 +35,12 @@ echo "::notice:: Found target Node version: $TARGET_NODE_VERSION"
 
 # Install 'n' and upgrade Node directly as root inside Docker
 pnpm install -g n
+
+# Override global SHELLOPTS env,
+# otherwise `n` command fails
+set +o errexit
 n $TARGET_NODE_VERSION
+set -o errexit
 
 # Clear the Linux command path cache so the new version is tracked immediately
 hash -r
