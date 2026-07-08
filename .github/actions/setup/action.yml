@@ -8,6 +8,12 @@ inputs:
   private-key:
     description: GitHub App private key
     required: true
+  permission-contents:
+    description: Contents permission for the GitHub App token
+    required: false
+  permission-pull-requests:
+    description: Pull requests permission for the GitHub App token
+    required: false
 
 outputs:
   token:
@@ -26,12 +32,13 @@ runs:
       with:
         client-id: ${{ inputs.client-id }}
         private-key: ${{ inputs.private-key }}
+        permission-contents: ${{ inputs.permission-contents }}
+        permission-pull-requests: ${{ inputs.permission-pull-requests }}
 
     - name: Configure Git Identity
       shell: bash
       run: .github/scripts/configure-git-identity.sh
       env:
-        REPO: ${{ github.repository }}
         TOKEN: ${{ steps.generate-token.outputs.token }}
         APP_SLUG: ${{ steps.generate-token.outputs.app-slug }}
 
