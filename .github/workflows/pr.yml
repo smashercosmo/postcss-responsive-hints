@@ -22,22 +22,17 @@ on:
       - main
 
 jobs:
-  setup:
-    permissions:
-      contents: read
-    uses: ./.github/workflows/setup.yml
-
   validate:
     name: Lint, test, and check changes
-    needs: setup
     runs-on: ubuntu-latest
-
+    permissions:
+      contents: write
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+      - name: Setup
+        uses: ./.github/actions/setup
         with:
-          fetch-depth: 0
-          persist-credentials: false
+          client-id: ${{ vars.RELEASE_BOT_CLIENT_ID }}
+          private-key: ${{ secrets.RELEASE_BOT_PRIVATE_KEY }}
 
       - name: Add mock changeset (ACT)
         if: env.ACT == 'true' && github.head_ref != 'changeset-release/main'
