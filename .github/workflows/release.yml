@@ -36,7 +36,7 @@ jobs:
 
       - name: Setup
         id: setup
-        uses: .github/actions/setup
+        uses: ./.github/actions/setup
         with:
           client-id: ${{ vars.RELEASE_BOT_CLIENT_ID }}
           private-key: ${{ secrets.RELEASE_BOT_PRIVATE_KEY }}
@@ -69,14 +69,14 @@ jobs:
       # --- Case A: pending changesets -> create release PR, stop here ---
       - name: Create release PR
         if: steps.check.outputs.has_changesets == 'true'
-        uses: .github/actions/create-release-pr
+        uses: ./.github/actions/create-release-pr
         with:
           git_env_config: ${{ steps.setup.outputs.git_env_config }}
 
       # --- Case B: no pending changesets -> pack and upload tarballs ---
       - name: Pack and upload tarballs
         if: steps.check.outputs.has_changesets == 'false'
-        uses: .github/actions/pack-and-upload-tarballs
+        uses: ./.github/actions/pack-and-upload-tarballs
 
   publish:
     needs: version-and-pack
@@ -96,7 +96,7 @@ jobs:
 
       - name: Setup
         id: setup
-        uses: .github/actions/setup
+        uses: ./.github/actions/setup
         with:
           client-id: ${{ vars.RELEASE_BOT_CLIENT_ID }}
           private-key: ${{ secrets.RELEASE_BOT_PRIVATE_KEY }}
