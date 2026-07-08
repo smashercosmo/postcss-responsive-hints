@@ -23,7 +23,7 @@ outputs:
     description: GitHub App slug
     value: ${{ steps.generate-token.outputs.app-slug }}
   git_env_config:
-    description: "JSON string containing all Git environment configuration variables"
+    description: JSON string containing all Git environment configuration variables
     value: ${{ steps.git-identity.outputs.git_env_config }}
 
 runs:

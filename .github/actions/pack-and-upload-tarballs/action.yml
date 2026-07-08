@@ -1,0 +1,24 @@
+name: Tarballs
+description: Pack and upload tarballs
+
+runs:
+  using: composite
+  steps:
+    - name: Compute publish plan
+      shell: bash
+      run: pnpm changeset publish-plan --output=publish-plan.json
+
+    - name: Pack tarballs from plan
+      shell: bash
+      run: pnpm changeset pack --from-publish-plan=publish-plan.json --out-dir tarballs
+
+    # Doesn't work with act until this is resolved https://github.com/nektos/act/issues/6114
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+      id: upload
+      if: env.ACT != 'true'
+      with:
+        name: release-tarballs
+        path: tarballs/
+        retention-days: 1
+        if-no-files-found: ignore
