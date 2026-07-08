@@ -1,0 +1,62 @@
+name: Setup
+
+env:
+  # errexit - exit immediately if any command fails
+  # nounset - error on use of undefined variables
+  # pipefail - pipeline fails if any command in it fails, not just the last one
+  SHELLOPTS: errexit:nounset:pipefail
+
+defaults:
+  run:
+    shell: bash
+
+permissions: {}
+
+on:
+  workflow_call:
+    outputs:
+      token:
+        description: GitHub App installation access token
+        value: ${{ jobs.build.outputs.artifact-name }}
+
+jobs:
+  setup:
+    environment: release
+    runs-on: ubuntu-latest
+    outputs:
+      token: ${{ steps.generate-token.outputs.token }}
+    steps:
+      - name: Generate GitHub token
+        # actions/create-github-app-token is not supported by Act at the moment
+        if: env.ACT != 'true'
+        id: generate-token
+        uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3.2.0
+        with:
+          client-id: ${{ vars.RELEASE_BOT_CLIENT_ID }}
+          private-key: ${{ secrets.RELEASE_BOT_PRIVATE_KEY }}
+
+      - name: Checkout repository
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          fetch-depth: 0
+          token: ${{ steps.generate-token.outputs.token }}
+          persist-credentials: false
+
+      - name: Configure Git Identity
+        run: .github/scripts/configure-git-identity.sh
+        env:
+          REPO: ${{ github.repository }}
+          TOKEN: ${{ steps.generate-token.outputs.token }}
+          APP_SLUG: ${{ steps.generate-token.outputs.app-slug }}
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271 # v6.0.9
+        with:
+          cache: true
+          # --frozen-lockfile might be redundant as for ci environments it's always set
+          # https://pnpm.io/cli/install#--frozen-lockfile
+          run_install: |
+            args: [--frozen-lockfile]
+
+      - name: Setup node
+        uses: ./.github/actions/setup-node
