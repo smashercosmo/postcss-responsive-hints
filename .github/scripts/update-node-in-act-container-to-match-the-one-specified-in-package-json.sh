@@ -1,5 +1,9 @@
 #!/usr/bin/env bash
 
+set -o errexit
+set -o nounset
+set -o pipefail
+
 # Install jq to parse package configurations safely
 # --yes tells the package manager to automatically answer "yes" to any confirmation prompts
 apt-get update && apt-get install --yes jq
