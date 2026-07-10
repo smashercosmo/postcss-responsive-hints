@@ -1,9 +1,11 @@
 #!/usr/bin/env bash
+set -e
 
 : "${APP_SLUG:?APP_SLUG is required}" "${GH_TOKEN:?GH_TOKEN is required}"
 
-BASIC_AUTH=$(printf "x-access-token:%s" "$GH_TOKEN" | base64)
-app_user="$APP_SLUG[bot]"
+# Use -w 0 to prevent base64 from breaking the header with newlines
+BASIC_AUTH=$(printf "x-access-token:%s" "$GH_TOKEN" | base64 -w 0)
+app_user="${APP_SLUG}[bot]"
 app_id="$(gh api "/users/$app_user" --jq .id)"
 
 # Build the keys and values
@@ -14,10 +16,23 @@ VALUE_1="$app_user"
 KEY_2="user.email"
 VALUE_2="$app_id+$app_user@users.noreply.github.com"
 
-# Combine into a compact JSON string
-# Using printf to cleanly format without relying on external tools like jq
-GIT_ENV_JSON=$(printf '{"GIT_CONFIG_COUNT":"3","GIT_CONFIG_KEY_0":"%s","GIT_CONFIG_VALUE_0":"%s","GIT_CONFIG_KEY_1":"%s","GIT_CONFIG_VALUE_1":"%s","GIT_CONFIG_KEY_2":"%s","GIT_CONFIG_VALUE_2":"%s","GH_TOKEN":"%s"}' \
-  "$KEY_0" "$VALUE_0" "$KEY_1" "$VALUE_1" "$KEY_2" "$VALUE_2", "$GH_TOKEN")
+# Safely construct the JSON string using jq (natively available on GH runners)
+# This guarantees quotes and special characters are perfectly escaped.
+GIT_ENV_JSON=$(jq -n -c \
+  --arg k0 "$KEY_0" --arg v0 "$VALUE_0" \
+  --arg k1 "$KEY_1" --arg v1 "$VALUE_1" \
+  --arg k2 "$KEY_2" --arg v2 "$VALUE_2" \
+  --arg token "$GH_TOKEN" \
+  '{
+    "GIT_CONFIG_COUNT": "3",
+    "GIT_CONFIG_KEY_0": $k0,
+    "GIT_CONFIG_VALUE_0": $v0,
+    "GIT_CONFIG_KEY_1": $k1,
+    "GIT_CONFIG_VALUE_1": $v1,
+    "GIT_CONFIG_KEY_2": $k2,
+    "GIT_CONFIG_VALUE_2": $v2,
+    "GH_TOKEN": $token
+  }')
 
-# Write the single string to outputs
+# Write the securely formatted JSON string to outputs
 echo "git_env_config=$GIT_ENV_JSON" >> "$GITHUB_OUTPUT"
