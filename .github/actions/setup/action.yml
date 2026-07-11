@@ -14,6 +14,9 @@ inputs:
   permission-pull-requests:
     description: Pull requests permission for the GitHub App token
     required: false
+  with_run_install:
+    description: Should install packages
+    required: true
 
 outputs:
   token:
@@ -47,6 +50,7 @@ runs:
         APP_SLUG: ${{ steps.generate-token.outputs.app-slug }}
 
     - name: Install pnpm
+      if: inputs.with_run_install == 'true'
       uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271 # v6.0.9
       with:
         cache: true
@@ -55,5 +59,9 @@ runs:
         run_install: |
           args: [--frozen-lockfile]
 
-    - name: Setup node
-      uses: ./.github/actions/setup-node
+    - name: Setup Node.js (CI)
+      uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
+      with:
+        cache: pnpm
+        cache-dependency-path: pnpm-lock.yaml
+        node-version-file: package.json

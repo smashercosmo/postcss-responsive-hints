@@ -40,10 +40,11 @@ jobs:
         with:
           client-id: ${{ vars.RELEASE_BOT_CLIENT_ID }}
           private-key: ${{ secrets.RELEASE_BOT_PRIVATE_KEY }}
+          with_run_install: 'true'
 
       - name: Add mock changeset (ACT)
         if: env.ACT == 'true' && github.head_ref != 'changeset-release/main'
-        run: .github/scripts/add-mock-changeset.sh
+        run: .github/scripts/simulate-changes-pr-merge.sh
 
       - name: Require a changeset for publishable changes
         run: .github/scripts/get-changeset-status.sh

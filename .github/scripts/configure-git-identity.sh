@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-set -e
 
 : "${APP_SLUG:?APP_SLUG is required}" "${GH_TOKEN:?GH_TOKEN is required}"
 
@@ -16,6 +15,24 @@ VALUE_1="$app_user"
 KEY_2="user.email"
 VALUE_2="$app_id+$app_user@users.noreply.github.com"
 
+# Build the JSON with jq instead of printf/string interpolation, so
+# values are properly escaped (no risk of stray characters or injection
+# if any value ever contains a quote, backslash, etc).
+GIT_ENV_JSON=$(jq -nc \
+  --arg key0 "$KEY_0" --arg val0 "$VALUE_0" \
+  --arg key1 "$KEY_1" --arg val1 "$VALUE_1" \
+  --arg key2 "$KEY_2" --arg val2 "$VALUE_2" \
+  --arg token "$GH_TOKEN" \
+  '{
+    GIT_CONFIG_COUNT:  "3",
+    GIT_CONFIG_KEY_0:   $key0,
+    GIT_CONFIG_VALUE_0: $val0,
+    GIT_CONFIG_KEY_1:   $key1,
+    GIT_CONFIG_VALUE_1: $val1,
+    GIT_CONFIG_KEY_2:   $key2,
+    GIT_CONFIG_VALUE_2: $val2,
+    GH_TOKEN:           $token
+  }')
 # Safely construct the JSON string using jq (natively available on GH runners)
 # This guarantees quotes and special characters are perfectly escaped.
 GIT_ENV_JSON=$(jq -n -c \
