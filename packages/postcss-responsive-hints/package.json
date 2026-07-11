@@ -14,8 +14,7 @@
   "scripts": {
     "build": "tsdown",
     "dev": "tsdown --watch",
-    "typecheck": "tsc",
-    "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist && rm -rf package"
+    "typecheck": "tsc"
   },
   "devDependencies": {
     "@postcss-responsive-hints/tsconfig": "workspace:*",

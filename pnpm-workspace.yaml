@@ -1,7 +1,9 @@
 packages:
-  - .
   - packages/*
   - apps/*
+
+allowBuilds:
+  lefthook: true
 
 catalogs:
   dev:
