@@ -1,36 +1,6 @@
-rc: ./.git/.local.config.sh
-
-pre-commit:
-  setup:
-    - run: |
-        export GIT_CONFIG_COUNT=1
-        export GIT_CONFIG_KEY_0=core.editor
-        export GIT_CONFIG_VALUE_0=true
-  commands:
-    commit:
-      run: echo "Hello world"
-
-prepare-commit-msg:
-  setup:
-    - run:
-        export GIT_CONFIG_COUNT=1
-        export GIT_CONFIG_KEY_0=core.editor
-        export GIT_CONFIG_VALUE_0=true
-  skip:
-    - run: '! (exec 3<>/dev/tty) 2>/dev/null'
-  commands:
-    commit:
-      interactive: true
-      run: pnpm cz --hook
-
-
 commit-msg:
-  setup:
-    - run:
-        export GIT_CONFIG_COUNT=1
-        export GIT_CONFIG_KEY_0=core.editor
-        export GIT_CONFIG_VALUE_0=true
   commands:
     commit:
-      run: echo "Hello world"
+      run: pnpm commitlint --edit $1
+
 
