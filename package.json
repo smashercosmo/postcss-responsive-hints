@@ -9,7 +9,8 @@
     "clean": "pnpm --filter '*' --filter '.' exec rm -rf .turbo node_modules dist package",
     "test:project": "f() { vitest run --project=\"$1\"; }; f",
     "ci:version": "changeset version && pnpm ci",
-    "actions:update": "actions-up"
+    "actions:update": "actions-up",
+    "hooks:update": "lefthook uninstall && lefthook install"
   },
   "keywords": [
     "postcss",
