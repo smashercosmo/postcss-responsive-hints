@@ -15,41 +15,23 @@ VALUE_1="$app_user"
 KEY_2="user.email"
 VALUE_2="$app_id+$app_user@users.noreply.github.com"
 
-# Build the JSON with jq instead of printf/string interpolation, so
-# values are properly escaped (no risk of stray characters or injection
-# if any value ever contains a quote, backslash, etc).
-GIT_ENV_JSON=$(jq -nc \
-  --arg key0 "$KEY_0" --arg val0 "$VALUE_0" \
-  --arg key1 "$KEY_1" --arg val1 "$VALUE_1" \
-  --arg key2 "$KEY_2" --arg val2 "$VALUE_2" \
-  --arg token "$GH_TOKEN" \
-  '{
-    GIT_CONFIG_COUNT:  "3",
-    GIT_CONFIG_KEY_0:   $key0,
-    GIT_CONFIG_VALUE_0: $val0,
-    GIT_CONFIG_KEY_1:   $key1,
-    GIT_CONFIG_VALUE_1: $val1,
-    GIT_CONFIG_KEY_2:   $key2,
-    GIT_CONFIG_VALUE_2: $val2,
-    GH_TOKEN:           $token
-  }')
-# Safely construct the JSON string using jq (natively available on GH runners)
-# This guarantees quotes and special characters are perfectly escaped.
-GIT_ENV_JSON=$(jq -n -c \
-  --arg k0 "$KEY_0" --arg v0 "$VALUE_0" \
-  --arg k1 "$KEY_1" --arg v1 "$VALUE_1" \
-  --arg k2 "$KEY_2" --arg v2 "$VALUE_2" \
-  --arg token "$GH_TOKEN" \
-  '{
-    "GIT_CONFIG_COUNT": "3",
-    "GIT_CONFIG_KEY_0": $k0,
-    "GIT_CONFIG_VALUE_0": $v0,
-    "GIT_CONFIG_KEY_1": $k1,
-    "GIT_CONFIG_VALUE_1": $v1,
-    "GIT_CONFIG_KEY_2": $k2,
-    "GIT_CONFIG_VALUE_2": $v2,
-    "GH_TOKEN": $token
-  }')
+{
+  echo "GIT_CONFIG_COUNT=3"
 
-# Write the securely formatted JSON string to outputs
-echo "git_env_config=$GIT_ENV_JSON" >> "$GITHUB_OUTPUT"
+  echo "GIT_CONFIG_KEY_0=http.https://github.com/.extraheader"
+  echo "GIT_CONFIG_VALUE_0<<EOF_VALUE_0"
+  echo "AUTHORIZATION: basic $BASIC_AUTH"
+  echo "EOF_VALUE_0"
+
+  echo "GIT_CONFIG_KEY_1=user.name"
+  echo "GIT_CONFIG_VALUE_1<<EOF_VALUE_1"
+  echo "$app_user"
+  echo "EOF_VALUE_1"
+
+  echo "GIT_CONFIG_KEY_2=user.email"
+  echo "GIT_CONFIG_VALUE_2<<EOF_VALUE_2"
+  echo "$app_id+$app_user@users.noreply.github.com"
+  echo "EOF_VALUE_2"
+
+  echo "GH_TOKEN=$GH_TOKEN"
+} >> "$GITHUB_ENV"

@@ -1,20 +1,15 @@
 name: Create release PR
 description: Version packages and create release PR
 
-inputs:
-  git_env_config:
-    description: JSON string containing all Git environment configuration variables
-    required: true
-
 runs:
   using: composite
   steps:
     - name: Version packages
       shell: bash
       run: .github/scripts/version-packages.sh
-      env: ${{ fromJSON(inputs.git_env_config) }}
 
     - name: Create/update release PR
       shell: bash
       run: .github/scripts/create-update-release-pr.sh
-      env: ${{ fromJSON(inputs.git_env_config) }}
+      env:
+        RELEASE_BRANCH_NAME: ${{ vars.RELEASE_BRANCH_NAME }}

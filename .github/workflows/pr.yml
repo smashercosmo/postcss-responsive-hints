@@ -42,11 +42,29 @@ jobs:
           private-key: ${{ secrets.RELEASE_BOT_PRIVATE_KEY }}
           with_run_install: 'true'
 
-      - name: Add mock changeset (ACT)
-        if: env.ACT == 'true' && github.head_ref != 'changeset-release/main'
-        run: .github/scripts/simulate-changes-pr-merge.sh
-
-      - name: Require a changeset for publishable changes
-        run: .github/scripts/get-changeset-status.sh
+      - name: Generates changesets (only for tests)
+        if: env.ACT == 'true' && env.GENERATE_CHANGESETS == 'true'
+        run: .github/tests/__scripts__/add-mock-changeset.sh
         env:
-          HEAD_REF: ${{ github.head_ref }}
+          FEATURE_BRANCH_NAME: ${{ vars.FEATURE_BRANCH_NAME }}
+          CHANGESET_DESCRIPTION: ${{ vars.CHANGESET_DESCRIPTION }}
+
+      - name: Check for the presence of changesets files
+        id: changesets
+        run: .github/scripts/get-changeset-status.sh
+
+      - name: Check feature branch
+        if: github.head_ref != vars.RELEASE_BRANCH_NAME
+        run: |
+          if [ "${{ steps.changesets.outputs.has_changesets }}" = 'false' ]; then
+            echo "No changesets found. Please run 'pnpm changeset add' and push the changes."
+            exit 1
+          fi
+
+      - name: Check release branch
+        if: github.head_ref == vars.RELEASE_BRANCH_NAME
+        run: |
+          if [ "${{ steps.changesets.outputs.has_changesets }}" = 'true' ]; then
+            echo "Found changesets on the release branch. There is something wrong with your workflow"
+            exit 1
+          fi

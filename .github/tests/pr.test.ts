@@ -1,73 +1,79 @@
-import { readFileSync } from "node:fs";
-import { dirname, join } from "node:path";
-import { describe, it, expect } from "vitest";
-import { ActRunner, ActExecStatus } from "@pshevche/act-test-runner";
-import { fileURLToPath } from "node:url";
+import { describe, it, expect, beforeEach } from "vitest";
+import { ActRunner, ActExecStatus } from "act-test-runner";
+import { EOL } from "node:os";
+import * as path from "node:path";
+import * as fs from "node:fs";
+import { execSync } from "node:child_process";
+import url from 'node:url'
 
-const __dirname = dirname(fileURLToPath(import.meta.url));
+const currentDirectory = path.dirname(url.fileURLToPath(import.meta.url));
+const rootNodeModulesDirectory = execSync("pnpm root", { encoding: "utf-8" });
+const rootProjectDirectory = path.resolve(rootNodeModulesDirectory, "..");
 
-type Release = {
-  name: string;
-  type: string;
-  oldVersion: string;
-  newVersion: string;
-};
-
-function getJsonFromResultOutput<T>(output: string) {
-  const JSON_REGEX = /```json\s+([\s\S]*?)```/;
-  const match = output.match(JSON_REGEX);
-  const rawJsonString = match && match[1] ? match[1].trim() : "{}";
-  return JSON.parse(rawJsonString) as T;
+function envFileToJson(envFilePath: string) {
+  const envFileBody = fs.readFileSync(envFilePath, "utf8");
+  return Object.fromEntries(
+    envFileBody
+      .split(new RegExp(EOL))
+      .filter(Boolean)
+      .map((pair) => pair.split("=")),
+  ) as Record<string, string>;
 }
 
-function findReleaseByName({ releases, name }: { releases: Release[]; name: string }) {
-  return releases.find((release) => release.name === name);
+const varsFilePath = path.resolve(currentDirectory, ".vars.test");
+const varsJsonObject = envFileToJson(varsFilePath);
+const workflowPath = path.resolve(rootProjectDirectory, ".github/workflows/pr.yml");
+const workflowBody = fs.readFileSync(workflowPath, "utf8");
+
+function createActRunner({ branch }: { branch: string; workflow: string }): ActRunner {
+  return new ActRunner()
+    .withEvent("pull_request", {
+      pull_request: { head: { ref: `${branch}` }, base: { ref: "main" } },
+    })
+    .withVariablesFile(varsFilePath)
+    .withWorkflowBody(workflowBody)
+    .forwardOutput();
 }
 
-const fixturesDir = join(__dirname, "./__fixtures__");
-const workflowPath = join(__dirname, "../workflows/pr.yml");
-const workflowBody = readFileSync(workflowPath, "utf8");
+describe("Feature PR workflow", () => {
+  let actRunner: ActRunner;
 
-describe("PR check workflow", () => {
-  it("should successfully run the feature PR workflow", async () => {
-    const result = await new ActRunner()
-      .withEvent("pull_request")
-      .withAdditionalArgs("--eventpath", join(fixturesDir, "./events/changes-pr-event.json"))
-      .withWorkflowBody(workflowBody)
-      .forwardOutput()
-      .run();
-
-    const { releases } = getJsonFromResultOutput<{ releases: Release[] }>(result.output);
-    const postcssResponsiveHintsRelease = findReleaseByName({
-      releases,
-      name: "postcss-responsive-hints",
+  beforeEach(() => {
+    actRunner = createActRunner({
+      branch: varsJsonObject.FEATURE_BRANCH_NAME,
+      workflow: workflowBody,
     });
-    const postcssResponsiveHintsExampleRelease = findReleaseByName({
-      releases,
-      name: "@postcss-responsive-hints/example",
-    });
+  });
 
-    expect(result.status).toBe(ActExecStatus.SUCCESS);
-    expect(releases.length).toBe(2);
-    expect(postcssResponsiveHintsRelease?.newVersion).toBe(
-      `${Number(postcssResponsiveHintsRelease?.oldVersion[0]) + 1}.0.0`,
-    );
-    expect(postcssResponsiveHintsExampleRelease?.newVersion).toBe(
-      postcssResponsiveHintsExampleRelease?.oldVersion,
-    );
+  it("should fail when feature PR does not have generated changesets", async () => {
+    const result = await actRunner.run();
+
+    expect(result.status).toBe(ActExecStatus.FAILED);
   }, 140000);
 
-  it("should successfully run the changeset-release PR workflow", async () => {
-    const result = await new ActRunner()
-    .withEvent("pull_request")
-    .withAdditionalArgs("--eventpath", join(fixturesDir, "./events/release-pr-event.json"))
-    .withWorkflowBody(workflowBody)
-    .forwardOutput()
-    .run();
-
-    const json = getJsonFromResultOutput<{ "github": { "head_ref": string } }>(result.output);
-    
+  it("should succeed when feature PR has generated changesets", async () => {
+    const result = await actRunner.withEnvValues(["GENERATE_CHANGESETS", "true"]).run();
     expect(result.status).toBe(ActExecStatus.SUCCESS);
-    expect(json.github.head_ref).toBe("changeset-release/main");
+  }, 140000);
+});
+
+describe("Release PR workflow", () => {
+  let actRunner: ActRunner;
+
+  beforeEach(() => {
+    actRunner = createActRunner({
+      branch: varsJsonObject.RELEASE_BRANCH_NAME,
+      workflow: workflowBody,
+    });
+  });
+
+  it("should fail when release PR has generated changesets", async () => {
+    const result = await actRunner.withEnvValues(["GENERATE_CHANGESETS", "true"]).run();
+    expect(result.status).toBe(ActExecStatus.FAILED);
+  }, 140000);
+
+  it("should succeed when release PR doesn't have generated changesets", async () => {
+    const result = await actRunner.run();
+    expect(result.status).toBe(ActExecStatus.SUCCESS);
   }, 140000);
 });

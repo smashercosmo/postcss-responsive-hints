@@ -1,6 +1,7 @@
 {
   "name": "root",
   "private": true,
+  "type": "module",
   "description": "PostCSS plugin that makes it easier to write responsive styles",
   "scripts": {
     "build": "turbo build",
@@ -36,6 +37,7 @@
     "@postcss-responsive-hints/vitest": "workspace:*",
     "@pshevche/act-test-runner": "catalog:tools",
     "@types/node": "catalog:types",
+    "act-test-runner": "file:packages/act-test-runner/pshevche-act-test-runner-1.0.2.tgz",
     "actions-up": "catalog:tools",
     "clean-publish": "catalog:tools",
     "commitizen": "^4.3.2",

@@ -1,4 +1,4 @@
--P custom-act-image
+-P ubuntu-latest=custom-act-image:latest
 --cache-server-path=/tmp/act-cache
 --cache-server-addr=localhost
 --cache-server-port=0

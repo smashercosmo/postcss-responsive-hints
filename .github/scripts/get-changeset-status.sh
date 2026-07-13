@@ -1,14 +1,22 @@
 #!/usr/bin/env bash
 
-: "${HEAD_REF:?HEAD_REF is required}"
+if pnpm changeset status --since=main --output status.json; then
+  COUNT=$(jq -r '.changesets | length' status.json)
 
-if [ "$HEAD_REF" = "changeset-release/main" ]; then
-  echo '```json' >> "$GITHUB_STEP_SUMMARY"
-  echo '{ "github": { "head_ref": "changeset-release/main" } }' >> "$GITHUB_STEP_SUMMARY"
-  echo '```' >> "$GITHUB_STEP_SUMMARY"
+  if [ "$COUNT" -ne 0 ]; then
+    HAS_CHANGESETS=true
+  else
+    HAS_CHANGESETS=false
+  fi
 else
-  pnpm changeset status --since=origin/main --output status.json
-  echo '```json' >> "$GITHUB_STEP_SUMMARY"
-  cat status.json >> "$GITHUB_STEP_SUMMARY"
-  echo '```' >> "$GITHUB_STEP_SUMMARY"
+  # Command failed (exit code 1), meaning no changesets exist.
+  HAS_CHANGESETS=false
 fi
+
+STATUS_JSON=$(cat status.json)
+
+echo "has_changesets=$HAS_CHANGESETS" >> "$GITHUB_OUTPUT"
+
+CHANGESETS_STATUS_JSON=$(cat status.json | jq -c)
+
+echo "changesets_status_json=$CHANGESETS_STATUS_JSON" >> "$GITHUB_OUTPUT"

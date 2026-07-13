@@ -44,10 +44,6 @@ jobs:
           permission-pull-requests: write
           with_run_install: 'true'
 
-      - name: Debug
-        run: echo "${{ steps.setup.outputs.git_env_config }}"
-
-
       - name: Act-only step for testing
         uses: ./.github/actions/changesets-act
 
@@ -132,4 +128,3 @@ jobs:
 
       - name: Create tags and GitHub release
         run: .github/scripts/create-tags-and-github-release.sh
-        env: ${{ fromJSON(steps.setup.outputs.git_env_config) }}

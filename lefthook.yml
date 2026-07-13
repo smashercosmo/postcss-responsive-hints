@@ -1,6 +1,7 @@
 commit-msg:
   commands:
     commit:
+      use_stdin: true
       run: pnpm commitlint --edit $1
 
 
