@@ -1,0 +1,20 @@
+{
+  "name": "@postcss-responsive-hints/commitlint",
+  "version": "1.0.0",
+  "private": true,
+  "sideEffects": false,
+  "type": "module",
+  "files": [
+    "src"
+  ],
+  "exports": {
+    ".": "./src/commitlint.config.ts",
+    "./package.json": "./package.json"
+  },
+  "dependencies": {
+    "@commitlint/config-conventional": "^21.2.0"
+  },
+  "devDependencies": {
+    "@commitlint/types": "^21.2.0"
+  }
+}
