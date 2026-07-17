@@ -1,0 +1,36 @@
+name: Setup pnpm
+description: Sets up pnpm using aggressive caching
+
+inputs:
+  pnpm_install:
+    description: Should install packages
+    required: true
+    default: "false"
+
+runs:
+  using: composite
+  steps:
+   - name: Install pnpm
+     uses: pnpm/action-setup@v4
+     with:
+       run_install: false
+
+   - name: Get pnpm store directory
+     shell: bash
+     run: |
+       echo "PNPM_STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
+
+   - name: Setup pnpm cache
+     uses: actions/cache@v4
+     with:
+       path: ${{ env.PNPM_STORE_PATH }}
+       key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+       restore-keys: |
+         ${{ runner.os }}-pnpm-store-
+
+   - name: Install dependencies
+     if: inputs.pnpm_install == 'true'
+     shell: bash
+     # --frozen-lockfile might be redundant as for ci environments it's always set
+     # https://pnpm.io/cli/install#--frozen-lockfile
+     run: pnpm install --frozen-lockfile
