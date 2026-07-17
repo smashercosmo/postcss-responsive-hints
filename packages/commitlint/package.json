@@ -8,7 +8,7 @@
     "src"
   ],
   "exports": {
-    ".": "./src/commitlint.config.ts",
+    "./*": "./src/*.ts",
     "./package.json": "./package.json"
   },
   "dependencies": {

@@ -1,0 +1,15 @@
+is_changeset_commit() {
+  local commit_message_file="$1"
+  local add_prefix=$(grep '^CHANGESET_ADD_COMMIT_MESSAGE_PREFIX=' .env | cut -d '=' -f2- | tr -d '"')
+  local version_prefix=$(grep '^CHANGESET_VERSION_COMMIT_MESSAGE_PREFIX=' .env | cut -d '=' -f2- | tr -d '"')
+  local escaped_add_prefix=$(printf '%s' "$add_prefix" | sed 's/[.[\\*+?^$|()]/\\&/g')
+  local escaped_version_prefix=$(printf '%s' "$version_prefix" | sed 's/[.[\\*+?^$|()]/\\&/g')
+
+  if grep -qE "^($escaped_add_prefix|$escaped_version_prefix)" "$commit_message_file"; then
+    echo "true"
+  else
+    echo "false"
+  fi
+}
+
+export -f is_changeset_commit

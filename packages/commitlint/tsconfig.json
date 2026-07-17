@@ -1,6 +1,3 @@
 {
-  "compilerOptions": {
-    "moduleResolution": "bundler",
-    "types": ["node"]
-  }
+  "include": ["src"]
 }

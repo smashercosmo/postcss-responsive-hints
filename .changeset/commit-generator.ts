@@ -20,26 +20,6 @@ function envFileToJson(envFilePath: string) {
 const envFilePath = path.resolve(rootProjectDirectory, ".env");
 const envJsonObject = envFileToJson(envFilePath);
 
-function lintCommitMessage(message: string) {
-  try {
-    execSync(
-      `echo "${message}" | pnpm commitlint --verbose --extends @postcss-responsive-hints/commitlint --extends ${rootProjectDirectory}/.changeset/.commitlintrc.json`,
-      { encoding: "utf-8" },
-    );
-  } catch (error) {
-    const msg =
-      typeof error === "object" &&
-      error !== null &&
-      "stdout" in error &&
-      typeof error.stdout === "string"
-        ? error.stdout
-        : "commit failed";
-    console.error("\nCommitlint error:\n");
-    console.error(msg);
-    process.exit(1);
-  }
-}
-
 function getPrivatePackagesSet() {
   const packages: { name: string; private?: boolean }[] = JSON.parse(
     execSync("pnpm list --recursive --depth -1 --json", { encoding: "utf-8" }),
@@ -49,9 +29,7 @@ function getPrivatePackagesSet() {
 
 const functions: CommitFunctions = {
   async getAddMessage(changeset) {
-    const message = `${envJsonObject.CHANGESET_ADD_COMMIT_MESSAGE_PREFIX}: ${changeset.summary}\n\nPackage: ${changeset.releases[0].name}\n\nVersion bump: ${changeset.releases[0].type}`;
-    lintCommitMessage(message);
-    return message;
+    return `${envJsonObject.CHANGESET_ADD_COMMIT_MESSAGE_PREFIX}: ${changeset.summary}\n\nPackage: ${changeset.releases[0].name}\n\nVersion bump: ${changeset.releases[0].type}`;
   },
   async getVersionMessage({ releases }) {
     const privatePackagesSet = getPrivatePackagesSet();
@@ -79,11 +57,9 @@ const functions: CommitFunctions = {
       ? [`Version bumps and changelog updates:\n\n${toBeVersionedLines}`]
       : [];
 
-    const message = [`${envJsonObject.CHANGESET_VERSION_COMMIT_MESSAGE_PREFIX}: ${summary}`, ...toBeReleasedBlock, ...toBeVersionedBlock].join(
+    return [`${envJsonObject.CHANGESET_VERSION_COMMIT_MESSAGE_PREFIX}: ${summary}`, ...toBeReleasedBlock, ...toBeVersionedBlock].join(
       "\n\n",
     );
-    lintCommitMessage(message);
-    return message;
   },
 };
 
