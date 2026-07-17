@@ -13,9 +13,9 @@ install_act() {
         current_act_version=$(act --version | awk '{print $3}')
     fi
 
-    if [ -f ".env.local" ]; then
+    if [ -f ".env" ]; then
         # Safely extract the ACT_VERSION value, ignoring comments, and removing quotes
-        target_act_version=$(grep -E '^ACT_VERSION=' .env.local | cut -d '=' -f 2- | tr -d '"' | tr -d "'")
+        target_act_version=$(grep -E '^ACT_VERSION=' .env | cut -d '=' -f 2- | tr -d '"' | tr -d "'")
     fi
 
     echo "Target 'act' version: $target_act_version"

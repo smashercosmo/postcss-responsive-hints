@@ -1,7 +1,15 @@
 commit-msg:
   commands:
     commit:
-      use_stdin: true
-      run: pnpm commitlint --edit $1 --extends @postcss-responsive-hints/commitlint
+      skip:
+        - run: |
+            # 
+            add_prefix=$(grep '^CHANGESET_ADD_COMMIT_MESSAGE_PREFIX=' .env | cut -d '=' -f2- | tr -d '"')
+            version_prefix=$(grep '^CHANGESET_VERSION_COMMIT_MESSAGE_PREFIX=' .env | cut -d '=' -f2- | tr -d '"')
+            escaped_add_prefix=$(printf '%s' "$add_prefix" | sed 's/[.[\\*+?^$|()]/\\&/g')
+            escaped_version_prefix=$(printf '%s' "$version_prefix" | sed 's/[.[\\*+?^$|()]/\\&/g')
+            grep -E "^($escaped_add_prefix|$escaped_version_prefix)" .git/COMMIT_EDITMSG
+      run: |
+        pnpm commitlint --edit {1} --extends @postcss-responsive-hints/commitlint
 
 
