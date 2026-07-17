@@ -11,7 +11,7 @@ runs:
   using: composite
   steps:
    - name: Install pnpm
-     uses: pnpm/action-setup@v4
+     uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271 # v6.0.9
      with:
        run_install: false
 
@@ -21,7 +21,7 @@ runs:
        echo "PNPM_STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
 
    - name: Setup pnpm cache
-     uses: actions/cache@v4
+     uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
      with:
        path: ${{ env.PNPM_STORE_PATH }}
        key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
