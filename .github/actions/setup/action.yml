@@ -19,7 +19,6 @@ inputs:
     required: true
     default: "false"
 
-
 outputs:
   token:
     description: GitHub App installation access token
@@ -49,11 +48,13 @@ runs:
         APP_SLUG: ${{ steps.generate-token.outputs.app-slug }}
 
     - name: Install pnpm
+      id: pnpm
       uses: ./.github/actions/setup-pnpm
       with:
         pnpm_install: ${{ inputs.pnpm_install }}
 
     - name: Setup Node.js (CI)
+      id: node
       uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
       with:
         node-version-file: package.json

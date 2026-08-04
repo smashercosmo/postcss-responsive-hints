@@ -1,0 +1,17 @@
+{
+  "name": "@root/github",
+  "version": "1.0.0",
+  "sideEffects": false,
+  "type": "module",
+  "scripts": {
+    "test": "vitest run"
+  },
+  "devDependencies": {
+    "@pshevche/act-test-runner": "catalog:dev",
+    "@root/tsconfig": "workspace:*"
+  },
+  "dependencies": {
+    "@mswjs/http-middleware": "^0.10.3",
+    "msw": "^2.15.0"
+  }
+}

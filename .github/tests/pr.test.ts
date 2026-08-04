@@ -1,38 +1,24 @@
-import { describe, it, expect, beforeEach } from "vitest";
-import { ActRunner, ActExecStatus } from "act-test-runner";
-import { EOL } from "node:os";
-import * as path from "node:path";
-import * as fs from "node:fs";
-import { execSync } from "node:child_process";
-import url from 'node:url'
+import { ActRunner, ActExecStatus } from "@pshevche/act-test-runner";
+import url from "node:url";
+import { describe, it, expect, beforeEach, inject } from "vitest";
 
-const currentDirectory = path.dirname(url.fileURLToPath(import.meta.url));
-const rootNodeModulesDirectory = execSync("pnpm root", { encoding: "utf-8" });
-const rootProjectDirectory = path.resolve(rootNodeModulesDirectory, "..");
+import { getActArgs, FEATURE_BRANCH_NAME, RELEASE_BRANCH_NAME } from "./actrc.ts";
 
-function envFileToJson(envFilePath: string) {
-  const envFileBody = fs.readFileSync(envFilePath, "utf8");
-  return Object.fromEntries(
-    envFileBody
-      .split(new RegExp(EOL))
-      .filter(Boolean)
-      .map((pair) => pair.split("=")),
-  ) as Record<string, string>;
-}
+const args = getActArgs({ gitTmoDir: inject("GIT_TMP_DIR") });
 
-const varsFilePath = path.resolve(currentDirectory, ".vars.test");
-const varsJsonObject = envFileToJson(varsFilePath);
-const workflowPath = path.resolve(rootProjectDirectory, ".github/workflows/pr.yml");
-const workflowBody = fs.readFileSync(workflowPath, "utf8");
+const workflowPath = url.fileURLToPath(
+  import.meta.resolve("../workflows/pr.yml"),
+);
 
-function createActRunner({ branch }: { branch: string; workflow: string }): ActRunner {
+function createActRunner({ branch }: { branch: string }): ActRunner {
   return new ActRunner()
     .withEvent("pull_request", {
-      pull_request: { head: { ref: `${branch}` }, base: { ref: "main" } },
+      pull_request: { base: { ref: "main" }, head: { ref: `${branch}` } },
     })
-    .withVariablesFile(varsFilePath)
-    .withWorkflowBody(workflowBody)
-    .forwardOutput();
+    .withWorkflowFile(workflowPath)
+    .withAdditionalArgs(
+      ...args.flatMap(item => item)
+    );
 }
 
 describe("Feature PR workflow", () => {
@@ -40,21 +26,21 @@ describe("Feature PR workflow", () => {
 
   beforeEach(() => {
     actRunner = createActRunner({
-      branch: varsJsonObject.FEATURE_BRANCH_NAME,
-      workflow: workflowBody,
+      branch: FEATURE_BRANCH_NAME,
     });
   });
 
   it("should fail when feature PR does not have generated changesets", async () => {
     const result = await actRunner.run();
-
     expect(result.status).toBe(ActExecStatus.FAILED);
-  }, 140000);
+  }, 140_000);
 
   it("should succeed when feature PR has generated changesets", async () => {
-    const result = await actRunner.withEnvValues(["GENERATE_CHANGESETS", "true"]).run();
+    const result = await actRunner
+      .withEnvValues(["GENERATE_CHANGESETS", "true"])
+      .run();
     expect(result.status).toBe(ActExecStatus.SUCCESS);
-  }, 140000);
+  }, 140_000);
 });
 
 describe("Release PR workflow", () => {
@@ -62,18 +48,19 @@ describe("Release PR workflow", () => {
 
   beforeEach(() => {
     actRunner = createActRunner({
-      branch: varsJsonObject.RELEASE_BRANCH_NAME,
-      workflow: workflowBody,
+      branch: RELEASE_BRANCH_NAME,
     });
   });
 
   it("should fail when release PR has generated changesets", async () => {
-    const result = await actRunner.withEnvValues(["GENERATE_CHANGESETS", "true"]).run();
+    const result = await actRunner
+      .withEnvValues(["GENERATE_CHANGESETS", "true"])
+      .run();
     expect(result.status).toBe(ActExecStatus.FAILED);
-  }, 140000);
+  }, 140_000);
 
   it("should succeed when release PR doesn't have generated changesets", async () => {
     const result = await actRunner.run();
     expect(result.status).toBe(ActExecStatus.SUCCESS);
-  }, 140000);
+  }, 140_000);
 });

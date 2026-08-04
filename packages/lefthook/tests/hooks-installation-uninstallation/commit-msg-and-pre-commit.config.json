@@ -1,0 +1,16 @@
+{
+  "commit-msg": {
+    "command": [
+      {
+        "run": "echo \"commit-msg hook installed\""
+      }
+    ]
+  },
+  "pre-commit": {
+    "command": [
+      {
+        "run": "echo \"pre-commit hook installed\""
+      }
+    ]
+  }
+}

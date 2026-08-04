@@ -1,7 +1,0 @@
-{
-  "extends": "@postcss-responsive-hints/tsconfig/lib",
-  "compilerOptions": {
-    "types": ["node"]
-  },
-  "include": ["./src", "tsdown.config.ts"]
-}

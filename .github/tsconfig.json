@@ -1,6 +1,12 @@
 {
+  "extends": "@root/tsconfig/node",
+  "include": [
+    "./tests",
+    "./scripts",
+    "./vitest.setup.ts",
+    "./vitest.setup.global.ts"
+  ],
   "compilerOptions": {
-    "moduleResolution": "bundler",
-    "types": ["node"]
+    "resolveJsonModule": true
   }
 }

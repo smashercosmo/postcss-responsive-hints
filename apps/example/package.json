@@ -1,22 +1,18 @@
 {
-  "name": "@postcss-responsive-hints/example",
-  "type": "module",
+  "name": "@root/example",
   "version": "1.0.0",
   "private": true,
+  "type": "module",
   "sideEffects": false,
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/smashercosmo/postcss-responsive-hints.git",
-    "directory": "app/example"
-  },
   "scripts": {
     "dev": "vite",
-    "build": "tsc && vite build",
-    "preview": "vite preview"
+    "build": "vite build",
+    "preview": "vite preview",
+    "typecheck": "tsc -b --noEmit"
   },
   "devDependencies": {
-    "vite": "catalog:dev",
+    "@root/tsconfig": "workspace:*",
     "postcss-responsive-hints": "workspace:*",
-    "@postcss-responsive-hints/tsconfig": "workspace:*"
+    "vite": "catalog:dev"
   }
 }

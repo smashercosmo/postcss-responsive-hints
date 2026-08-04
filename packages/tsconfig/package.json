@@ -1,17 +1,17 @@
 {
-  "name": "@postcss-responsive-hints/tsconfig",
+  "name": "@root/tsconfig",
   "version": "1.0.0",
   "private": true,
   "sideEffects": false,
   "type": "module",
   "files": [
-    "dist"
+    "src"
   ],
-  "exports": {
-    "./*": "./dist/*.json",
-    "./package.json": "./package.json"
+  "devDependencies": {
+    "@types/node": "catalog:types"
   },
-  "scripts": {
-    "build": "rm -rf dist && cp -r src dist"
+  "exports": {
+    "./*": "./src/tsconfig.*.json",
+    "./package.json": "./package.json"
   }
 }

@@ -1,0 +1,9 @@
+{
+  "extends": "@root/tsconfig/app",
+  "include": ["./src"],
+  "compilerOptions": {
+    "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.app.tsbuildinfo",
+    "typeRoots": ["./node_modules"],
+    "types": ["vite/client"]
+  }
+}

@@ -1,0 +1,26 @@
+output:
+  - meta # Print lefthook version
+  - summary # Print summary block (successful and failed steps)
+  - empty_summary # Print summary heading when there are no steps to run
+  - success # Print successful steps
+  - failure # Print failed steps printing
+  - execution # Print any execution logs
+  - execution_out # Print execution output
+  - execution_info # Print `EXECUTE > ...` logging
+  - skips # Print "skip" (i.e. no files matched)
+
+lefthook: LEFTHOOK_CONFIG=$(pnpm --dir packages/lefthook prefix)/src/lefthook.yml $(pnpm --dir packages/lefthook bin)/lefthook
+
+commit-msg:
+  jobs:
+    - group:
+        jobs:
+          - name: Lint commits
+            run: pnpm commitlint --edit {1} --config ${LEFTHOOK_CONFIG%/*}/commitlint/base.config.ts
+            skip:
+              - run: node ${LEFTHOOK_CONFIG%/*}/scripts/is_changeset_commit.ts commit_edit_msg_path=$(git rev-parse --show-toplevel)/.git/COMMIT_EDITMSG
+
+          - name: Lint changesets commits
+            run: pnpm commitlint --edit {1} --extends ${LEFTHOOK_CONFIG%/*}/commitlint/changesets.config.ts
+            only:
+              - run: node ${LEFTHOOK_CONFIG%/*}/scripts/is_changeset_commit.ts commit_edit_msg_path=$(git rev-parse --show-toplevel)/.git/COMMIT_EDITMSG

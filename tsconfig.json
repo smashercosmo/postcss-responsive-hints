@@ -1,0 +1,4 @@
+{
+  "extends": "@root/tsconfig/node",
+  "include": [".pnpmfile.mjs"]
+}

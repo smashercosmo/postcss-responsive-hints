@@ -12,19 +12,18 @@ $ npm install postcss-responsive-hints
 ## Usage
 
 ```js
-const postcss = require("postcss")
+const postcss = require("postcss");
 
 const output = postcss()
-  .use(require('postcss-responsive-hints')({/* options */}))
-  .process(require("fs").readFileSync("input.css", "utf8"))
-  .css
+  .use(require("postcss-responsive-hints")({/* options */}))
+  .process(require("fs").readFileSync("input.css", "utf8")).css;
 ```
 
 Having the following styles in `input.css`:
 
 ```css
 .test {
-    padding: 10px | 20px | x | 30px;
+  padding: 10px | 20px | x | 30px;
 }
 ```
 
@@ -32,21 +31,21 @@ you will get:
 
 ```css
 .test {
-    padding: 10px;
+  padding: 10px;
 }
 
 @media (min-width: 480px) {
-    .test {
-        padding: 20px;
-    }
+  .test {
+    padding: 20px;
+  }
 }
 
 /* 768px media query will be skipped */
 
 @media (min-width: 1024px) {
-    .test {
-        padding: 30px;
-    }
+  .test {
+    padding: 30px;
+  }
 }
 ```
 
@@ -69,7 +68,7 @@ Example:
 
 ```css
 .test {
-    padding: 10px /* | 20px | x | 30px | */;
+  padding: 10px /* | 20px | x | 30px */;
 }
 ```
 

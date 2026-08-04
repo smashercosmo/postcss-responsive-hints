@@ -1,0 +1,27 @@
+{
+  "name": "@root/lefthook",
+  "version": "1.0.0",
+  "private": true,
+  "sideEffects": false,
+  "type": "module",
+  "files": [
+    "src"
+  ],
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "prepare": "LEFTHOOK_CONFIG=$PWD/src/lefthook.yml lefthook uninstall && LEFTHOOK_CONFIG=$PWD/src/lefthook.yml lefthook install"
+  },
+  "dependencies": {
+    "@commitlint/config-conventional": "catalog:dev",
+    "@root/shared": "workspace:*",
+    "@root/tsconfig": "workspace:*",
+    "lefthook": "catalog:dev"
+  },
+  "exports": {
+    "./package.json": "./package.json"
+  },
+  "devDependencies": {
+    "@commitlint/types": "catalog:types"
+  }
+}

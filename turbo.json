@@ -11,7 +11,14 @@
       "persistent": true
     },
     "test": {
-      "dependsOn": ["^test", "@postcss-responsive-hints/vitest#build"]
+      "dependsOn": ["^build"],
+      "cache": false
+    },
+    "topo": {
+      "dependsOn": ["^topo"]
+    },
+    "typecheck": {
+      "dependsOn": ["topo"]
     }
   }
 }

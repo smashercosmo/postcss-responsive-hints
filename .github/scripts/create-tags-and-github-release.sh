@@ -2,13 +2,13 @@
 
 # 1. Let changesets generate local tags for the new versions
 # (as we just need @changeset/cli package, we're not doing full-fledged `pnpm i`)
-pnx @changeset/cli@catalog:tools tag
+pnx @changeset/cli@catalog:dev tag
 
 # 2. Push the new tags to the remote
 git push origin --tags
 
 # 3. Create a GitHub Release for each new tag
-# git tag --points-at HEAD ensures we only release tags created in this run
+# .git tag --points-at HEAD ensures we only release tags created in this bin.sh
 NEW_TAGS=$(git tag --points-at HEAD)
 
 for TAG in $NEW_TAGS; do

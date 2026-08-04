@@ -13,10 +13,4 @@ else
   HAS_CHANGESETS=false
 fi
 
-STATUS_JSON=$(cat status.json)
-
 echo "has_changesets=$HAS_CHANGESETS" >> "$GITHUB_OUTPUT"
-
-CHANGESETS_STATUS_JSON=$(cat status.json | jq -c)
-
-echo "changesets_status_json=$CHANGESETS_STATUS_JSON" >> "$GITHUB_OUTPUT"

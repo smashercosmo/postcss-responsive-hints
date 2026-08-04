@@ -1,0 +1,9 @@
+{
+  "commit-msg": {
+    "command": [
+      {
+        "run": "echo \"commit-msg hook installed\""
+      }
+    ]
+  }
+}

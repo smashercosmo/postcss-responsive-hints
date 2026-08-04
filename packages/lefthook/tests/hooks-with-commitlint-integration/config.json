@@ -1,0 +1,22 @@
+{
+  "commit-msg": {
+    "commands": {
+      "lint-commits": {
+        "run": "echo \"Lint commits\"",
+        "skip": [
+          {
+            "run": "node \"$ROOT_DIR/src/scripts/is_changeset_commit.ts\" commit_edit_msg_path=$COMMIT_EDITMSG"
+          }
+        ]
+      },
+      "lint-changesets-commits": {
+        "run": "echo \"Lint changesets commits\"",
+        "only": [
+          {
+            "run": "node \"$ROOT_DIR/src/scripts/is_changeset_commit.ts\" commit_edit_msg_path=$COMMIT_EDITMSG"
+          }
+        ]
+      }
+    }
+  }
+}
