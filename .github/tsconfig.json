@@ -3,6 +3,7 @@
   "include": [
     "./tests",
     "./scripts",
+    "./actions",
     "./vitest.setup.ts",
     "./vitest.setup.global.ts"
   ],

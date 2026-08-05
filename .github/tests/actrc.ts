@@ -1,4 +1,3 @@
-import { CUSTOM_ACT_IMAGE } from "./constants"
 import { generateKeyPairSync } from "node:crypto";
 
 /** Generate a valid 2048-bit RSA key for tests */
@@ -8,6 +7,7 @@ export const DUMMY_PRIVATE_KEY = generateKeyPairSync("rsa", {
   publicKeyEncoding: { format: "pem", type: "spki" },
 }).privateKey;
 
+export const CUSTOM_ACT_IMAGE = "custom-act-image";
 export const RELEASE_BRANCH_NAME = "__test_release_branch__"
 export const FEATURE_BRANCH_NAME = "__test_feature_branch__"
 export const CHANGESET_DESCRIPTION = "__changeset_description__"
@@ -32,6 +32,7 @@ export function getActArgs({ gitTmoDir }: { gitTmoDir: string }) {
     ["--no-skip-checkout"],
     ["--pull=false"],
     ["--directory", gitTmoDir],
+    ['--verbose'],
 
     /**
      * While macOS Docker Desktop resolves host.docker.internal automatically,

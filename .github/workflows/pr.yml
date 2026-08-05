@@ -42,10 +42,7 @@ jobs:
           # allows act to fall back to unauthenticated public fetches
           # when downloading actions from github.com
           token: ${{ github.token || vars.DUMMY_GITHUB_TOKEN }}
-          fetch-depth: 0
           persist-credentials: false
-
-      - run: echo "?????????$(git rev-parse --abbrev-ref HEAD)"
 
       - name: Setup
         id: setup

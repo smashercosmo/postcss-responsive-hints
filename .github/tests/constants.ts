@@ -1,1 +1,0 @@
-export const CUSTOM_ACT_IMAGE = "custom-act-image";

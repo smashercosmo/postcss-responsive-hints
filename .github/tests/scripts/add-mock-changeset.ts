@@ -22,26 +22,34 @@ function run(command: string) {
 // 1. Find git root
 const root = run("git rev-parse --show-toplevel")
 
-// 2. Generate pending change file
-run(`pnpm change postcss-responsive-hints --bump major --summary "${CHANGESET_DESCRIPTION}"`);
+function generateAndCommitPendingChangeFile({ bump, pkg }: { bump: "major" | "minor" | "patch"; pkg: string, }) {
+  // 2. Generate pending change file
+  run(`pnpm change ${pkg} --bump ${bump} --summary "${CHANGESET_DESCRIPTION}"`);
 
-// 3. Let's create git worktree as I don't want to change branches
-const worktree = path.join(root, "../tmp-worktree");
-run(`git worktree add -B ${BRANCH_NAME} ${worktree}`);
+  // 3. Let's create git worktree as I don't want to change branches
+  const worktree = path.join(root, "../tmp-worktree");
+  run(`git worktree add -B ${BRANCH_NAME} ${worktree}`);
 
 // 4. Move to the worktree directory
-run(`cd ${worktree}`);
+  run(`cd ${worktree}`);
 
 // 5. Add generated pending change file
-run(`git add .`);
+  run(`git add .`);
 
 // 6. Commit generated file
-const changeStatus = run("pnpm change status");
-const commitMessage = `docs: add pending change intents\n\n${changeStatus}`;
-run(`git commit -m "${commitMessage}"`);
+  const changeStatus = run("pnpm change status");
+  const commitMessage = `docs: add pending change intents\n\n${changeStatus}`;
+  run(`git commit -m "${commitMessage}"`);
 
 // 6. Go back to main repo
-run(`cd ${root}`);
+  run(`cd ${root}`);
 
 // 7. Remove temporary worktree
-run(`git worktree remove ${worktree}`);
+  run(`git worktree remove ${worktree}`);
+}
+
+generateAndCommitPendingChangeFile({ bump: "major", pkg: "postcss-responsive-hints" });
+generateAndCommitPendingChangeFile({ bump: "minor", pkg: "@root/lefthook" });
+
+
+

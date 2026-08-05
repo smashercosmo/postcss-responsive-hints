@@ -11,6 +11,8 @@
     "@root/tsconfig": "workspace:*"
   },
   "dependencies": {
+    "@actions/core": "^3.0.1",
+    "@actions/github": "^9.1.1",
     "@mswjs/http-middleware": "^0.10.3",
     "msw": "^2.15.0"
   }

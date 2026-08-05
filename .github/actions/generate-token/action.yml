@@ -34,4 +34,4 @@ runs:
         private-key: ${{ inputs.private-key }}
         permission-contents: ${{ inputs.permission-contents }}
         permission-pull-requests: ${{ inputs.permission-pull-requests }}
-        github-api-url: ${{ env.GITHUB_API_URL || github.api_url }}
+        github-api-url: ${{ github.api_url }}

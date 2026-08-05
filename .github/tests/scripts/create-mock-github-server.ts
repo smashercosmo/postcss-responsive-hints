@@ -3,11 +3,19 @@ import { http as mswHttp, HttpResponse } from "msw";
 import http from "node:http";
 
 const handlers = [
+  mswHttp.get("*/users/:username", () => {
+    return HttpResponse.json(
+      {
+        id: 111_111_111,
+      },
+      { headers: { "content-type": "application/json" }, status: 200 },
+    );
+  }),
   mswHttp.get("*/repos/*/*/installation", () => {
     return HttpResponse.json(
       {
         app_slug: "some-app-slug",
-        id: 12_345_678,
+        id: 222_222_222,
       },
       { headers: { "content-type": "application/json" }, status: 200 },
     );

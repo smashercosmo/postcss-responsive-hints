@@ -3,7 +3,7 @@ import crypto from "node:crypto";
 import fs from "node:fs";
 import path from "node:path";
 import url from "node:url";
-import { CUSTOM_ACT_IMAGE } from "../constants";
+import { CUSTOM_ACT_IMAGE } from "../actrc";
 
 const SCRIPTS_DIR = path.dirname(url.fileURLToPath(import.meta.url));
 

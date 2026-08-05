@@ -2,7 +2,7 @@ name: Setup pnpm
 description: Sets up pnpm using aggressive caching
 
 inputs:
-  pnpm_install:
+  install:
     description: Should install packages
     required: true
     default: "false"
@@ -10,15 +10,11 @@ inputs:
 runs:
   using: composite
   steps:
-    - name: Install pnpm
-      id: install-pnpm
-      uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271 # v6.0.9
-      with:
-        run_install: false
+
 
     - name: Install dependencies
-      id: install-deps
-      if: inputs.pnpm_install == 'true'
+      id: install-dependencies
+      if: inputs.install == 'true'
       shell: bash
       # --frozen-lockfile might be redundant as for ci environments it's always set
       # https://pnpm.io/cli/install#--frozen-lockfile
