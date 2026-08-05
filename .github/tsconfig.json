@@ -3,10 +3,12 @@
   "include": [
     "./tests",
     "./scripts",
+    "./actions",
     "./vitest.setup.ts",
     "./vitest.setup.global.ts"
   ],
   "compilerOptions": {
+    "allowArbitraryExtensions": true,
     "resolveJsonModule": true
   }
 }

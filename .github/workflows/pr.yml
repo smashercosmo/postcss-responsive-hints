@@ -29,7 +29,7 @@ jobs:
     permissions:
       contents: read
     steps:
-      - name: Configure local repository fallback for act
+      - name: Configure local repository fallback (only for tests)
         if: env.ACT == 'true'
         run: |
           git config --global url."file:///host-repo/".insteadOf "https://github.com/smashercosmo/postcss-responsive-hints"
@@ -42,35 +42,34 @@ jobs:
           # allows act to fall back to unauthenticated public fetches
           # when downloading actions from github.com
           token: ${{ github.token || vars.DUMMY_GITHUB_TOKEN }}
-          fetch-depth: 0
           persist-credentials: false
-
-      - run: echo "?????????$(git rev-parse --abbrev-ref HEAD)"
 
       - name: Setup
         id: setup
         uses: ./.github/actions/setup
         with:
-          client-id: ${{ vars.RELEASE_BOT_CLIENT_ID }}
+          app-id: ${{ vars.RELEASE_BOT_APP_ID }}
           private-key: ${{ secrets.RELEASE_BOT_PRIVATE_KEY }}
+          permission-contents: read
+          permission-pull-requests: read
 
-      - name: Generates changesets (only for tests)
-        id: test-fixtures
-        if: env.ACT == 'true' && env.GENERATE_CHANGESETS == 'true'
-        run: node .github/tests/scripts/add-mock-changeset.ts
-        env:
-          BRANCH_NAME: ${{ github.head_ref }}
-          CHANGESET_DESCRIPTION: ${{ vars.CHANGESET_DESCRIPTION }}
+      - name: Add pending change files (only for tests)
+        id: add-pending-change-files
+        if: env.ACT == 'true' && env.ADD_PENDING_CHANGE_FILES == 'true'
+        uses: ./.github/actions/add-pending-change-files
+        with:
+          branch-name: ${{ github.head_ref }}
+          change-file-summary: ${{ vars.CHANGE_FILE_SUMMARY }}
 
-      - name: Check for the presence of changesets files
-        id: status
-        run: node .github/scripts/check-changes-status.ts
+      - name: Check pending change files
+        id: check-pending-change-files
+        uses: ./.github/actions/check-pending-change-files
 
       - name: Check feature branch
         id: check-feature-branch
         if: github.head_ref != vars.RELEASE_BRANCH_NAME
         run: |
-          if [ "${{ steps.status.outputs.has_changesets }}" = 'false' ]; then
+          if [ "${{ steps.check-pending-change-files.outputs.has-pending-change-files }}" = 'false' ]; then
             echo "No changesets found. Please run 'pnpm changeset add' and push the changes."
             exit 1
           fi
@@ -79,7 +78,7 @@ jobs:
         id: check-release-branch
         if: github.head_ref == vars.RELEASE_BRANCH_NAME
         run: |
-          if [ "${{ steps.status.outputs.has_changesets }}" = 'true' ]; then
+          if [ "${{ steps.check-pending-change-files.outputs.has-pending-change-files }}" = 'true' ]; then
             echo "Found changesets on the release branch. There is something wrong with your workflow"
             exit 1
           fi

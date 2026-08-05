@@ -6,7 +6,7 @@ runs:
   steps:
     - name: Version packages
       shell: bash
-      run: .github/scripts/version-packages.sh
+      run: .github/scripts/index.ts
 
     - name: Create/update release PR
       shell: bash

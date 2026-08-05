@@ -1,0 +1,14 @@
+name: Configure GIT identity
+description: Sets up git config (via GITHUB_ENV) to make commits as a GitHub App bot user.
+
+inputs:
+  token:
+    description: GitHub App installation access token
+    required: true
+  app-slug:
+    description: GitHub App slug
+    required: true
+
+runs:
+  using: node24
+  main: index.ts

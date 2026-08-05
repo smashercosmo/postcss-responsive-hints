@@ -1,0 +1,11 @@
+name: Bump versions and update changelogs
+description: GitHub Action for bumping versions and updating changelogs based on existing change files
+
+inputs:
+  branch-name:
+    description: Branch to commit updated package.json and changelog files
+    required: true
+
+runs:
+  using: node24
+  main: index.ts

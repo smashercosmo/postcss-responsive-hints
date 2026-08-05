@@ -75,7 +75,7 @@ export default defineConfig({
     "no-class-assign": "error",
     "no-compare-neg-zero": "error",
     "no-cond-assign": "error",
-    "no-console": ["error", { allow: ["error", "info"] }],
+    "no-console": ["error", { allow: ["error", "info", 'warn'] }],
     "no-const-assign": "error",
     "no-constant-binary-expression": "error",
     "no-constant-condition": "error",

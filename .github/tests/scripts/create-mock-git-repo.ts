@@ -1,6 +1,7 @@
 import { execSync } from "node:child_process";
 import fs from "node:fs";
 import path from "node:path";
+import { RELEASE_BRANCH_NAME, FEATURE_BRANCH_NAME } from "../actrc";
 
 const monorepoRoot = execSync("git rev-parse --show-toplevel", {
   encoding: "utf8",
@@ -40,4 +41,6 @@ export function createMockGitRepo(gitTmpDir: string) {
 
   exec("git add .");
   exec("git commit -m 'initial monorepo commit'");
+  exec(`git branch ${RELEASE_BRANCH_NAME}`);
+  exec(`git branch ${FEATURE_BRANCH_NAME}`);
 }
