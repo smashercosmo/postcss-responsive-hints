@@ -2,18 +2,16 @@ name: Setup project
 description: Generate GitHub token, configure GIT, install pnpm, setup Node, install dependencies
 
 inputs:
-  client-id:
-    description: GitHub App client ID
+  app-id:
+    description: GitHub App ID
     required: true
   private-key:
     description: GitHub App private key
     required: true
-  permission-contents:
-    description: Contents permission for the GitHub App token
-    required: false
   permission-pull-requests:
-    description: Pull requests permission for the GitHub App token
-    required: false
+    description: The level of permission to grant the access token for pull requests and related comments, assignees, labels, milestones, and merges. Can be set to 'read' or 'write'.
+  permission-contents:
+    description: The level of permission to grant the access token for repository contents, commits, branches, downloads, releases, and merges. Can be set to 'read' or 'write'.
   install:
     description: Should install dependencies
     required: true
@@ -22,10 +20,10 @@ inputs:
 outputs:
   token:
     description: GitHub App installation access token
-    value: ${{ steps.generate-github-token.outputs.token }}
+    value: ${{ steps.create-github-token.outputs.token }}
   app-slug:
     description: GitHub App slug
-    value: ${{ steps.generate-github-token.outputs.app-slug }}
+    value: ${{ steps.create-github-token.outputs.app-slug }}
 
 runs:
   using: composite
@@ -43,11 +41,14 @@ runs:
       with:
         node-version-file: package.json
 
-    - name: Generate GitHub token
-      id: generate-github-token
-      uses: ./.github/actions/generate-token
+    - shell: bash
+      run: pnpm i @actions/core @actions/github @octokit/auth-app --filter=@root/github
+
+    - name: Create GitHub token
+      id: create-github-token
+      uses: ./.github/actions/create-token
       with:
-        client-id: ${{ inputs.client-id }}
+        app-id: ${{ inputs.app-id }}
         private-key: ${{ inputs.private-key }}
         permission-contents: ${{ inputs.permission-contents }}
         permission-pull-requests: ${{ inputs.permission-pull-requests }}
@@ -59,5 +60,5 @@ runs:
       id: configure-git-identity
       uses: ./.github/actions/configure-git-identity
       with:
-        token: ${{ steps.generate-github-token.outputs.token }}
-        app-slug: ${{ steps.generate-github-token.outputs.app-slug }}
+        token: ${{ steps.create-github-token.outputs.token }}
+        app-slug: ${{ steps.create-github-token.outputs.app-slug }}

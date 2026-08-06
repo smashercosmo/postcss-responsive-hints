@@ -29,102 +29,45 @@ jobs:
       has_changesets: ${{ steps.check.outputs.has_changesets }}
       artifact_created: ${{ steps.pack_and_upload.outputs.artifact-id != '' }}
     steps:
+      - name: Configure local repository fallback (only for tests)
+        if: env.ACT == 'true'
+        run: |
+          git config --global url."file:///host-repo/".insteadOf "https://github.com/smashercosmo/postcss-responsive-hints"                    
+
       - name: Checkout repository
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
+          # DUMMY_GITHUB_TOKEN (any string that doesn't start with `ghs_`)
+          # allows act to fall back to unauthenticated public fetches
+          # when downloading actions from github.com
+          token: ${{ github.token || vars.DUMMY_GITHUB_TOKEN }}
           persist-credentials: false
 
       - name: Setup
         id: setup
         uses: ./.github/actions/setup
         with:
-          client-id: ${{ vars.RELEASE_BOT_CLIENT_ID }}
+          app-id: ${{ vars.RELEASE_BOT_APP_ID }}
           private-key: ${{ secrets.RELEASE_BOT_PRIVATE_KEY }}
           permission-contents: write
           permission-pull-requests: write
-          pnpm_install: "true"
+          install: "true"
 
-      - name: Act-only step for testing
-        uses: ./.github/actions/changesets-act
+      - name: Add pending change files (only for tests)
+        id: add-pending-change-files
+        if: env.ACT == 'true' && env.ADD_PENDING_CHANGE_FILES == 'true'
+        uses: ./.github/actions/add-pending-change-files
+        with:
+          branch-name: ${{ vars.RELEASE_BRANCH_NAME }}
+          change-file-summary: ${{ vars.CHANGE_FILE_SUMMARY }}
 
-      - name: Check for pending changesets
-        id: check
-        run: .github/scripts/check-for-pending-changesets.sh
+      - name: Check pending change files
+        id: check-pending-change-files
+        uses: ./.github/actions/check-pending-change-files
 
       # --- Case A: pending changesets -> create release PR, stop here ---
       - name: Create release PR
-        if: steps.check.outputs.has_changesets == 'true'
-        uses: ./.github/actions/create-release-pr
+        if: steps.check-pending-change-files.outputs.has-pending-change-files == 'true'
+        uses: ./.github/actions/bump-versions-and-update-changelogs
         with:
-          git_env_config: ${{ steps.setup.outputs.git_env_config }}
-
-      # --- Case B: no pending changesets -> pack and upload tarballs ---
-      - name: Build
-        if: steps.check.outputs.has_changesets == 'false'
-        run: pnpm bin.sh build.ts
-
-      - name: Pack and upload tarballs
-        id: pack_and_upload
-        if: steps.check.outputs.has_changesets == 'false'
-        uses: ./.github/actions/pack-and-upload-tarballs
-
-  publish:
-    needs: version-and-pack-and-upload
-    if: >
-      needs.version-and-pack-and-upload.outputs.has_changesets == 'false' &&
-      needs.version-and-pack-and-upload.outputs.artifact_created == 'true'
-    runs-on: ubuntu-latest
-    environment: release
-    permissions:
-      id-token: write
-      contents: write
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          fetch-depth: "1"
-          persist-credentials: false
-
-      - name: Setup
-        id: setup
-        uses: ./.github/actions/setup
-        with:
-          client-id: ${{ vars.RELEASE_BOT_CLIENT_ID }}
-          private-key: ${{ secrets.RELEASE_BOT_PRIVATE_KEY }}
-          permission-contents: write
-          pnpm_install: "false"
-
-      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
-        id: download
-        with:
-          name: release-tarballs
-          path: tarballs/
-
-      - name: Publish tarballs
-        run: .github/scripts/publish-tarballs.sh
-
-  post-publish:
-    runs-on: ubuntu-latest
-    needs: publish
-    environment: release
-    permissions:
-      contents: read
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          fetch-depth: "1"
-          fetch-tags: "true"
-          persist-credentials: false
-
-      - name: Setup
-        id: setup
-        uses: ./.github/actions/setup
-        with:
-          client-id: ${{ vars.RELEASE_BOT_CLIENT_ID }}
-          private-key: ${{ secrets.RELEASE_BOT_PRIVATE_KEY }}
-          permission-contents: write
-          pnpm_install: "false"
-
-      - name: Create tags and GitHub release
-        run: .github/scripts/create-tags-and-github-release.sh
+          branch-name: ${{ vars.RELEASE_BRANCH_NAME }}

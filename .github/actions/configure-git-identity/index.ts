@@ -1,12 +1,10 @@
-import { getInput, exportVariable, setFailed, debug } from "@actions/core";
+import { getInput, exportVariable, setFailed } from "@actions/core";
 import { getOctokit, context } from "@actions/github";
 import { Buffer } from "node:buffer";
 
 try {
-  const appSlug = getInput("app_slug", { required: true });
+  const appSlug = getInput("app-slug", { required: true });
   const token = getInput("token", { required: true });
-
-  debug(context.apiUrl)
 
   const appUser = `${appSlug}[bot]`;
   const basicAuth = Buffer.from(`x-access-token:${token}`).toString("base64");

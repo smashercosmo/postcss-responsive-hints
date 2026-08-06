@@ -1,0 +1,74 @@
+diff --git a/dist/ActRunner.d.ts b/dist/ActRunner.d.ts
+index af787891dec0cd0d7b9c37af7c5d966dc7fcc115..8f070eb9c7a05e988e3fabf7710031a446a9d958 100644
+--- a/dist/ActRunner.d.ts
++++ b/dist/ActRunner.d.ts
+@@ -21,6 +21,7 @@
+ import { WebhookEventMap, WebhookEventName } from '@octokit/webhooks-types';
+ import { ActWorkflowExecResult } from './ActWorkflowExecResult.js';
+ import { PartialDeep } from './utils/types.js';
++import {s} from "vitest/dist/chunks/reporters.d.DtoKVV2s";
+ type EventPayload<TEventType extends WebhookEventName | undefined = undefined> = (TEventType extends WebhookEventName ? PartialDeep<WebhookEventMap[TEventType]> | string : string) | undefined;
+ /**
+  * Invokes `act`, allowing end-to-end testing of custom GitHub actions and workflows.
+@@ -32,6 +33,9 @@ type EventPayload<TEventType extends WebhookEventName | undefined = undefined> =
+  * The runner cannot be used concurrently due to limitations on the `act` side.
+  */
+ export declare class ActRunner<TEventType extends WebhookEventName | undefined = undefined, TEventPayload extends EventPayload<TEventType> = undefined> {
++    private eventToListen: "data" | "error" | undefined;
++    private listener: ((data: string) => void) | undefined;
++    private workingDir;
+     private workingDir;
+     private workflowFile;
+     private workflowBody;
+@@ -144,6 +148,7 @@ export declare class ActRunner<TEventType extends WebhookEventName | undefined =
+      * Forwards the `act` output to `console`.
+      */
+     forwardOutput(): this;
++    toOutputStream<Event extends "data" | "error">(event: Event, callback: (data: string) => void): this;
+     /**
+      * Invokes `act` with specified options.
+      * @returns workflow execution result for inspection
+diff --git a/dist/ActRunner.js b/dist/ActRunner.js
+index 96d5c87e7187bdc56a7f9e4979440fcea7c83e94..69d7150a8521901c6cdb2717c635a59e240e99ac 100644
+--- a/dist/ActRunner.js
++++ b/dist/ActRunner.js
+@@ -38,6 +38,8 @@ import { ActResourceSpec } from './internal/ActResourceSpec.js';
+  * The runner cannot be used concurrently due to limitations on the `act` side.
+  */
+ export class ActRunner {
++    eventToListen;
++    listener;
+     workingDir;
+     workflowFile;
+     workflowBody;
+@@ -202,6 +204,16 @@ export class ActRunner {
+         this.shouldForwardOutput = true;
+         return this;
+     }
++
++    /**
++     * @param { "data" | "error" } event
++     * @param {(chunk: string) => void} callback
++     */
++    toOutputStream(event, callback) {
++        this.eventToListen = event;
++        this.listener = callback;
++        return this;
++    }
+     /**
+      * Invokes `act` with specified options.
+      * @returns workflow execution result for inspection
+@@ -220,6 +232,13 @@ export class ActRunner {
+                     cleanupDir(this.workingDir);
+                     resolve(new ActWorkflowExecResult(code === 0 ? ActExecStatus.SUCCESS : ActExecStatus.FAILED, executionListener.getOutput(), executionListener.getJobs()));
+                 });
++
++                if (this.eventToListen === "data" && typeof this.listener === "function") {
++                  process.stdout.on('data', this.listener);
++                }
++                if (this.eventToListen === "error" && typeof this.listener === "function") {
++                    process.stderr.on('data', this.listener);
++                }
+             }
+             catch (err) {
+                 if (err instanceof ActRunnerError) {

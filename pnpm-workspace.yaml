@@ -15,6 +15,7 @@ catalogs:
     "@types/node": 26.1.2
     "@changesets/types": 6.1.0
     "@commitlint/types": 21.2.0
+    "@pnpm/types": 1101.8.0
   dev:
     vite: 8.1.5
     vitest: 4.1.10
@@ -28,12 +29,25 @@ catalogs:
     postcss: 8.x.x
     lefthook: 2.1.10
     oxfmt: 0.60.0
-    oxlint: 1.75.0
     commitizen: 4.3.2
     cz-conventional-changelog: 3.3.0
     "@commitlint/cli": 21.2.1
     "@commitlint/cz-commitlint": 21.2.0
     "@commitlint/config-conventional": 21.2.0
+    msw: 2.15.0
+    "@mswjs/http-middleware": 0.10.3
+  actions:
+    "@actions/core": 3.0.1
+    "@actions/github": 9.1.1
+    "@octokit/auth-app": 8.3.0
+    "@actions/exec": 3.0.0
+  lint:
+    oxlint: 1.75.0
+    eslint-plugin-no-only-tests: 3.4.0
+    eslint-plugin-perfectionist: 5.10.0
+    eslint-plugin-react-hooks: 7.1.1
+    eslint-plugin-unused-imports: 4.4.1
+
 
 allowBuilds:
   lefthook: false

@@ -1,0 +1,10 @@
+name: Check pending change files
+description: GitHub Action for checking if pending change files exist
+
+outputs:
+  has-pending-change-files:
+    description: Indicates the presence of pending change files
+
+runs:
+  using: node24
+  main: index.ts

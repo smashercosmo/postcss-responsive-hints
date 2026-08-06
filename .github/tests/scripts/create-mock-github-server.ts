@@ -4,30 +4,30 @@ import http from "node:http";
 
 const handlers = [
   mswHttp.get("*/users/:username", () => {
-    return HttpResponse.json(
-      {
-        id: 111_111_111,
-      },
-      { headers: { "content-type": "application/json" }, status: 200 },
-    );
+    return HttpResponse.json({
+      id: 111_111_111,
+    });
   }),
-  mswHttp.get("*/repos/*/*/installation", () => {
-    return HttpResponse.json(
-      {
-        app_slug: "some-app-slug",
-        id: 222_222_222,
-      },
-      { headers: { "content-type": "application/json" }, status: 200 },
-    );
+  mswHttp.get("*/repos/:owner/:repo/installation", () => {
+    return HttpResponse.json({
+      app_slug: "some-app-slug",
+      id: 222_222_222,
+    });
   }),
-  mswHttp.post("*/app/installations/*/access_tokens", () => {
+  mswHttp.post("*/app/installations/:installation_id/access_tokens", () => {
     return HttpResponse.json(
       {
         expires_at: "2030-01-01T00:00:00Z",
         token: "ghs_16C7e42F292c6912E7710c838347Ae178B4a",
       },
-      { headers: { "content-type": "application/json" }, status: 201 },
+      { status: 201 },
     );
+  }),
+  mswHttp.delete("*/installation/token", () => {
+    return HttpResponse.json(null, {
+      headers: { "content-type": "application/json" },
+      status: 204,
+    });
   }),
 ];
 
