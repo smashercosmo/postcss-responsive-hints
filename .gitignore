@@ -5,4 +5,5 @@ package
 .pnpm-store
 .idea
 .turbo
+.verdaccio
 *.tsbuildinfo

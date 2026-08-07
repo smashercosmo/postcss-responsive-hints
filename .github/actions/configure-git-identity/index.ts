@@ -15,16 +15,28 @@ try {
     username: appUser,
   });
 
-  exportVariable("GIT_CONFIG_COUNT", 3);
-  exportVariable("GIT_CONFIG_KEY_0", "http.https://github.com/.extraheader");
-  exportVariable("GIT_CONFIG_VALUE_0", `AUTHORIZATION: basic ${basicAuth}`);
-  exportVariable("GIT_CONFIG_KEY_1", "user.name");
-  exportVariable("GIT_CONFIG_VALUE_1", appUser);
-  exportVariable("GIT_CONFIG_KEY_2", "user.email");
+  const CURRENT_GIT_CONFIG_COUNT = Number(process.env.GIT_CONFIG_COUNT ?? 0);
+
+  const entries = [
+    [
+      "http.https://github.com/.extraheader",
+      `AUTHORIZATION: basic ${basicAuth}`,
+    ],
+    ["user.name", appUser],
+    ["user.email", `${appId}+${appUser}@users.noreply.github.com`],
+  ] as const;
+
   exportVariable(
-    "GIT_CONFIG_VALUE_2",
-    `${appId}+${appUser}@users.noreply.github.com`,
+    "GIT_CONFIG_COUNT",
+    String(CURRENT_GIT_CONFIG_COUNT + entries.length),
   );
+
+  entries.forEach(([key, value], index) => {
+    const i = CURRENT_GIT_CONFIG_COUNT + index;
+
+    exportVariable(`GIT_CONFIG_KEY_${i}`, key);
+    exportVariable(`GIT_CONFIG_VALUE_${i}`, value);
+  });
 } catch (error) {
   if (error instanceof Error) {
     setFailed(error.message);

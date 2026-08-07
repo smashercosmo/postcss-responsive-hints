@@ -1,5 +1,5 @@
 {
-  "name": "@root/shared",
+  "name": "@root/scripts",
   "version": "1.0.0",
   "sideEffects": false,
   "type": "module",
@@ -12,8 +12,11 @@
   "devDependencies": {
     "@root/tsconfig": "workspace:*"
   },
+  "bin": {
+    "deps-add": "./src/deps/add.ts",
+    "deps-remove": "./src/deps/remove.ts"
+  },
   "exports": {
-    ".": "./src/index.ts",
     "./package.json": "./package.json"
   }
 }

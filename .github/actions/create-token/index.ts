@@ -1,4 +1,11 @@
-import { getInput, setOutput, saveState, error, info, setFailed } from "@actions/core";
+import {
+  getInput,
+  setOutput,
+  saveState,
+  error,
+  info,
+  setFailed,
+} from "@actions/core";
 import { getOctokit, context } from "@actions/github";
 import { createAppAuth } from "@octokit/auth-app";
 

@@ -1,0 +1,10 @@
+storage: ./.verdaccio
+uplinks:
+  npmjs:
+    url: https://registry.npmjs.org/
+
+packages:
+  '@root/*':
+    access: $all
+    publish: $all
+    unpublish: $all

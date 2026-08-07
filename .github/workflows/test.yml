@@ -1,0 +1,38 @@
+name: Test
+
+on:
+  pull_request:
+    types:
+      - closed
+    branches:
+      - main
+
+jobs:
+  version-bumps-and-changelog-updates:
+    environment: release
+    runs-on: ubuntu-latest
+    if: github.event.pull_request.merged == true
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - uses: ./.github/actions/setup
+        id: setup
+        with:
+          app-id: ${{ vars.RELEASE_BOT_APP_ID }}
+          private-key: ${{ secrets.RELEASE_BOT_PRIVATE_KEY }}
+          permission-contents: read
+          permission-pull-requests: write
+          install: true
+
+      - uses: ./.github/actions/spin-up-verdaccio-server
+        id: verdaccio-server
+
+      - run: pnpm publish -r --registry ${{ steps.verdaccio-server.outputs.url }} --no-git-checks --filter "@root/*"
+
+      - run: pnpm version -r --registry ${{ steps.verdaccio-server.outputs.url }} --no-git-checks
+
+      - run: echo $(git status)

@@ -7,15 +7,24 @@
     "test": "vitest run"
   },
   "devDependencies": {
+    "@mswjs/http-middleware": "catalog:dev",
+    "@octokit/types": "catalog:types",
+    "@octokit/webhooks-types": "catalog:types",
     "@pshevche/act-test-runner": "catalog:dev",
-    "@root/tsconfig": "workspace:*"
+    "@root/tsconfig": "workspace:*",
+    "@types/http-proxy": "catalog:types",
+    "@verdaccio/types": "catalog:types",
+    "http-proxy": "catalog:dev",
+    "msw": "catalog:dev",
+    "type-fest": "catalog:types",
+    "typescript": "catalog:dev"
   },
   "dependencies": {
     "@actions/core": "catalog:actions",
     "@actions/exec": "catalog:actions",
     "@actions/github": "catalog:actions",
-    "@mswjs/http-middleware": "catalog:dev",
     "@octokit/auth-app": "catalog:actions",
-    "msw": "catalog:dev"
+    "@octokit/plugin-rest-endpoint-methods": "catalog:actions",
+    "verdaccio": "catalog:dev"
   }
 }

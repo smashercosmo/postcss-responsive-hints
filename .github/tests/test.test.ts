@@ -14,12 +14,12 @@ import { FEATURE_BRANCH_NAME, getActArgs } from "./actrc.ts";
 import { addPendingChangeFiles } from "./scripts/add-pending-change-files.ts";
 import { createMockGitRepo } from "./scripts/create-mock-git-repo.ts";
 import { server } from "./scripts/create-mock-github-server";
-import { getSha } from "./scripts/getSha";
+import { getSha } from "./scripts/getSha.ts";
 
 const tmpDirs: Array<string> = [];
 
 const workflowPath = url.fileURLToPath(
-  import.meta.resolve("../workflows/release.yml"),
+  import.meta.resolve("../workflows/test.yml"),
 );
 
 function createActRunner({ branch }: { branch: string }): ActRunner {
@@ -100,8 +100,8 @@ afterAll(() => {
   });*/
 });
 
-describe("Release workflow", () => {
-  it("should bump versions and update changelogs", async () => {
+describe("Test workflow", () => {
+  it("test", async () => {
     actRunnerInProgress = createActRunner({
       branch: FEATURE_BRANCH_NAME,
     }).run();

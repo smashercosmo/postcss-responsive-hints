@@ -1,73 +1,83 @@
 name: Release
 
-env:
-  # errexit - exit immediately if any command fails
-  # nounset - error on use of undefined variables
-  # pipefail - pipeline fails if any command in it fails, not just the last one
-  SHELLOPTS: errexit:nounset:pipefail
-
-defaults:
-  run:
-    shell: bash
-
-permissions: {}
-
 on:
-  push:
+  pull_request:
+    types:
+      - closed
     branches:
       - main
 
-concurrency: ${{ github.workflow }}-${{ github.ref }}
-
 jobs:
-  version-and-pack-and-upload:
+  check-for-pending-change-files:
+    environment: release
+    runs-on: ubuntu-latest
+    outputs:
+      has-pending-change-files: ${{ steps.check.outputs.has-pending-change-files }}
+    if: github.event.pull_request.merged == true
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - uses: ./.github/actions/setup
+        id: setup
+        with:
+          app-id: ${{ vars.RELEASE_BOT_APP_ID }}
+          private-key: ${{ secrets.RELEASE_BOT_PRIVATE_KEY }}
+          permission-contents: read
+          permission-pull-requests: write
+          install: true
+
+      - id: check
+        uses: ./.github/actions/check-for-pending-change-files
+
+  require-pending-change-files:
+    needs: check-for-pending-change-files
+    outputs:
+      has-pending-change-files: ${{ needs.check-for-pending-change-files.outputs.has-pending-change-files }}
+    environment: release
+    runs-on: ubuntu-latest
+    if: needs.check-for-pending-change-files.outputs.has-pending-change-files == 'false'
+    steps:
+      - run: |
+          echo "::error::No pending change files found. Please run 'pnpm change' and push the generated change files."
+          exit 1
+
+
+  version-bumps-and-changelog-updates:
+    needs: check-for-pending-change-files
+    if: needs.check-for-pending-change-files.outputs.has-pending-change-files == 'true'
     environment: release
     runs-on: ubuntu-latest
     permissions:
       contents: read
-    outputs:
-      has_changesets: ${{ steps.check.outputs.has_changesets }}
-      artifact_created: ${{ steps.pack_and_upload.outputs.artifact-id != '' }}
     steps:
-      - name: Configure local repository fallback (only for tests)
-        if: env.ACT == 'true'
-        run: |
-          git config --global url."file:///host-repo/".insteadOf "https://github.com/smashercosmo/postcss-responsive-hints"                    
-
-      - name: Checkout repository
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          # DUMMY_GITHUB_TOKEN (any string that doesn't start with `ghs_`)
-          # allows act to fall back to unauthenticated public fetches
-          # when downloading actions from github.com
-          token: ${{ github.token || vars.DUMMY_GITHUB_TOKEN }}
+          ref: ${{ github.event.pull_request.base.ref }}
           persist-credentials: false
 
-      - name: Setup
+      - uses: ./.github/actions/setup
         id: setup
-        uses: ./.github/actions/setup
         with:
           app-id: ${{ vars.RELEASE_BOT_APP_ID }}
           private-key: ${{ secrets.RELEASE_BOT_PRIVATE_KEY }}
-          permission-contents: write
+          permission-contents: read
           permission-pull-requests: write
-          install: "true"
+          install: true
 
-      - name: Add pending change files (only for tests)
-        id: add-pending-change-files
-        if: env.ACT == 'true' && env.ADD_PENDING_CHANGE_FILES == 'true'
-        uses: ./.github/actions/add-pending-change-files
+      - uses: ./.github/actions/spin-up-verdaccio-server
+        id: verdaccio-server
+
+      - uses: ./.github/actions/bump-versions-and-update-changelogs
+        id: version
         with:
-          branch-name: ${{ vars.RELEASE_BRANCH_NAME }}
-          change-file-summary: ${{ vars.CHANGE_FILE_SUMMARY }}
+          release-branch-name: ${{ vars.RELEASE_BRANCH_NAME }}
+          private-registry-url: ${{ steps.verdaccio-server.outputs.url }}
 
-      - name: Check pending change files
-        id: check-pending-change-files
-        uses: ./.github/actions/check-pending-change-files
 
-      # --- Case A: pending changesets -> create release PR, stop here ---
-      - name: Create release PR
-        if: steps.check-pending-change-files.outputs.has-pending-change-files == 'true'
-        uses: ./.github/actions/bump-versions-and-update-changelogs
-        with:
-          branch-name: ${{ vars.RELEASE_BRANCH_NAME }}
+
+
+

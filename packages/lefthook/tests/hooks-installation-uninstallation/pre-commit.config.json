@@ -1,9 +1,0 @@
-{
-  "pre-commit": {
-    "command": [
-      {
-        "run": "echo \"pre-commit hook installed\""
-      }
-    ]
-  }
-}

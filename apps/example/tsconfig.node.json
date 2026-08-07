@@ -2,6 +2,7 @@
   "extends": "@root/tsconfig/node",
   "include": ["./vite.config.ts"],
   "compilerOptions": {
+    "composite": true,
     "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.node.tsbuildinfo"
   }
 }

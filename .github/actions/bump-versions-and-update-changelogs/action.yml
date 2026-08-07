@@ -2,8 +2,11 @@ name: Bump versions and update changelogs
 description: GitHub Action for bumping versions and updating changelogs based on existing change files
 
 inputs:
-  branch-name:
+  release-branch-name:
     description: Branch to commit updated package.json and changelog files
+    required: true
+  private-registry-url:
+    description: Registry to publish private packages to
     required: true
 
 runs:

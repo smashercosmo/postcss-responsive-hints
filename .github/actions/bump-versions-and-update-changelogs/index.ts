@@ -1,13 +1,13 @@
-import {getInput, setFailed} from "@actions/core";
+import { getInput, setFailed } from "@actions/core";
 import { exec, getExecOutput } from "@actions/exec";
 
 try {
-  const branchName = getInput("branch-name", { required: true });
-  await exec(`git checkout -B ${branchName}`);
-  const output = (await getExecOutput("pnpm version -r")).stdout;
+  await exec(`pnpm publish -r --registry ${getInput("private-registry-url")} --no-git-checks --access restricted --filter "@root/*"`);
+  const output = await getExecOutput(`pnpm version -r --registry ${getInput("private-registry-url")} --no-git-checks`);
   await exec("git add .");
-  const commitMessage = `docs: bump versions and update changelogs\n\n${output}`;
-  await exec(`git commit -m "${commitMessage}"`);
+  const message = `docs: bump versions and update changelogs\n\n${output}`;
+  await exec(`git checkout ${getInput("release-branch-name")}"`);
+  await exec(`git commit -m "${message}"`);
 } catch (error) {
   if (error instanceof Error) {
     setFailed(error.message);

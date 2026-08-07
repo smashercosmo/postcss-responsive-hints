@@ -1,0 +1,14 @@
+name: Checks for the presence (or absence) of pending change files
+description: GitHub Action that checks if pending change files exist (or not)
+
+outputs:
+  has-pending-change-files:
+    description: Indicates that pending change files exist (or not)
+    value: ${{ steps.check.outputs.has-pending-change-files }}
+
+runs:
+  using: composite
+  steps:
+    - id: check
+      run: ${{ github.action_path }}/index.sh
+      shell: bash

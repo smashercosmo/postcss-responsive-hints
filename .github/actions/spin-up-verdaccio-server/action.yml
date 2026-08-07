@@ -1,0 +1,13 @@
+name: spin-up-verdaccio-server
+description: spin-up-verdaccio-server
+
+outputs:
+  url:
+    description: Verdaccio server url
+  pid:
+    description: Verdaccio's process pid
+
+runs:
+  using: node24
+  main: index.ts
+  post: post.ts
