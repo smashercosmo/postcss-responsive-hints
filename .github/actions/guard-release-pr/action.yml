@@ -1,5 +1,5 @@
-name: Create release PR
-description: GitHub Action to create a release PR or update an existing one
+name: Guard Release PR
+description: GitHub Action that prevents manual creation of release PRs
 
 inputs:
   token:

@@ -22,63 +22,66 @@ on:
       - main
 
 jobs:
-  validate:
-    name: Lint, test, and check changes
+  check-for-changes:
+    name: Check for the presence of pending change files
+    environment: release
+    runs-on: ubuntu-latest
+    if: github.event.pull_request.head.ref != vars.RELEASE_BRANCH_NAME
+    outputs:
+      has-pending-changes: ${{ steps.status.outputs.has-pending-changes }}
+    permissions:
+      contents: read
+
+    steps:
+      - uses: actions/checkout@v7.0.1 # v7.0.1
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          persist-credentials: false
+          sparse-checkout: |
+            pnpm-workspace.yaml
+            pnpm-lock.yaml
+            package.json
+            .changeset
+            .github
+
+      - uses: pnpm/setup@84cb39b217b10273981911c288cd62326dc7c6d2 # v2.0.2
+        with:
+          install: false
+
+      - name: Check pending changes
+        id: status
+        uses: ./.github/actions/check-change-status
+
+      - name: Check non-release branch
+        run: |
+          if [ "${{ steps.status.outputs.has-pending-changes }}" = 'false' ]; then
+            echo "No changesets found. Please run 'pnpm change' and push the generated change files."
+            exit 1
+          fi
+
+  lint-and-test:
+    name: Lint changes and run tests
+    needs: check-for-changes
+    if: needs.check-for-changes.outputs.has-pending-changes == 'true'
     environment: release
     runs-on: ubuntu-latest
     permissions:
       contents: read
-    steps:
-      - name: Configure local repository fallback (only for tests)
-        if: env.ACT == 'true'
-        run: |
-          git config --global url."file:///host-repo/".insteadOf "https://github.com/smashercosmo/postcss-responsive-hints"
 
-      - name: Checkout repository
-        id: checkout
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+    steps:
+      - uses: actions/checkout@v7.0.1 # v7.0.1
         with:
-          # DUMMY_GITHUB_TOKEN (any string that doesn't start with `ghs_`)
-          # allows act to fall back to unauthenticated public fetches
-          # when downloading actions from github.com
-          token: ${{ github.token || vars.DUMMY_GITHUB_TOKEN }}
+          ref: ${{ github.event.pull_request.head.sha }}
           persist-credentials: false
 
-      - name: Setup
-        id: setup
-        uses: ./.github/actions/setup
+      - uses: pnpm/setup@84cb39b217b10273981911c288cd62326dc7c6d2 # v2.0.2
         with:
-          app-id: ${{ vars.RELEASE_BOT_APP_ID }}
-          private-key: ${{ secrets.RELEASE_BOT_PRIVATE_KEY }}
-          permission-contents: read
-          permission-pull-requests: read
+          cache: true
+          install: true
+          token: ""
 
-      - name: Add pending change files (only for tests)
-        id: add-pending-change-files
-        if: env.ACT == 'true' && env.ADD_PENDING_CHANGE_FILES == 'true'
-        uses: ./.github/actions/add-pending-change-files
-        with:
-          branch-name: ${{ github.head_ref }}
-          change-file-summary: ${{ vars.CHANGE_FILE_SUMMARY }}
-
-      - name: Check pending change files
-        id: check-pending-change-files
-        uses: ./.github/actions/check-pending-change-files
-
-      - name: Check feature branch
-        id: check-feature-branch
-        if: github.head_ref != vars.RELEASE_BRANCH_NAME
-        run: |
-          if [ "${{ steps.check-pending-change-files.outputs.has-pending-change-files }}" = 'false' ]; then
-            echo "No changesets found. Please run 'pnpm changeset add' and push the changes."
-            exit 1
-          fi
-
-      - name: Check release branch
-        id: check-release-branch
-        if: github.head_ref == vars.RELEASE_BRANCH_NAME
-        run: |
-          if [ "${{ steps.check-pending-change-files.outputs.has-pending-change-files }}" = 'true' ]; then
-            echo "Found changesets on the release branch. There is something wrong with your workflow"
-            exit 1
-          fi
+      # Ideally these two steps should be executed in parallel
+      # but `act` doesn't support it at the moment
+      # https://github.com/nektos/act/issues/6124
+      - run: pnpm lint
+      - run: pnpm test:ci

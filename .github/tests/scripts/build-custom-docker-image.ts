@@ -3,19 +3,21 @@ import crypto from "node:crypto";
 import fs from "node:fs";
 import path from "node:path";
 import url from "node:url";
+
 import { CUSTOM_ACT_IMAGE } from "../actrc";
 
 const SCRIPTS_DIR = path.dirname(url.fileURLToPath(import.meta.url));
 
-/**
- * Walk up from the script's own location until we find the Dockerfile
- */
+/** Walk up from the script's own location until we find the Dockerfile */
 function findDockerfileDir(startDir: string) {
   let searchDir = startDir;
-  while (!fs.existsSync(path.join(searchDir, "Dockerfile")) && searchDir !== "/") {
+  while (
+    !fs.existsSync(path.join(searchDir, "Dockerfile")) &&
+    searchDir !== "/"
+  ) {
     const parent = path.dirname(searchDir);
 
-    /** safety net against infinite loop */
+    /** Safety net against infinite loop */
     if (parent === searchDir) {
       break;
     }
@@ -32,13 +34,17 @@ function sha256File(path: string) {
 }
 
 function dockerImageExists(image: string) {
-  const result = child_process.spawnSync("docker", ["image", "inspect", image], {
+  const result = child_process.spawnSync(
+    "docker",
+    ["image", "inspect", image],
+    {
       /**
-       * `docker image inspect` outputs quite a lot of logs.
-       *  We don't need this extra noise.
+       * `docker image inspect` outputs quite a lot of logs. We don't need this
+       * extra noise.
        */
       stdio: "ignore",
-  });
+    },
+  );
   return result.status === 0;
 }
 
@@ -63,9 +69,12 @@ export function buildCustomDockerImage() {
     console.info(`✓ ${image} is up to date, skipping build`);
   } else {
     console.info(`Building ${image}...`);
-    child_process.execSync(`docker build -t ${image} -f ${dockerfile} ${dockerfileDir}`, {
-      stdio: "inherit",
-    });
+    child_process.execSync(
+      `docker build -t ${image} -f ${dockerfile} ${dockerfileDir}`,
+      {
+        stdio: "inherit",
+      },
+    );
     fs.writeFileSync(hashFile, currentHash);
   }
 }

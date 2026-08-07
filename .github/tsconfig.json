@@ -1,5 +1,5 @@
 {
-  "extends": "@root/tsconfig/node",
+  "extends": "tsconfig/node",
   "include": [
     "./tests",
     "./scripts",

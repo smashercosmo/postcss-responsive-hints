@@ -9,12 +9,11 @@
   "scripts": {
     "build": "tsdown",
     "dev": "tsdown --watch",
-    "typecheck": "tsc --noEmit",
-    "test": "vitest run"
+    "typecheck": "tsc --noEmit"
   },
   "devDependencies": {
-    "@root/shared": "workspace:*",
-    "@root/tsconfig": "workspace:*",
+    "shared": "*",
+    "tsconfig": "*",
     "postcss": "catalog:dev",
     "tsdown": "catalog:dev"
   },

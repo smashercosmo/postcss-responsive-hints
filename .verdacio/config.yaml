@@ -1,0 +1,12 @@
+storage: ./storage
+auth:
+  htpasswd:
+    file: ./htpasswd
+    max_users: -1
+packages:
+  "@root/*":
+    access: $all
+    publish: $anonymous
+    unpublish: $anonymous
+logs: { type: stdout, format: pretty, level: warn }
+listen: 0.0.0.0:4873

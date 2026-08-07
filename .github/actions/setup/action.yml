@@ -30,19 +30,10 @@ runs:
   steps:
     - name: Setup pnpm
       id: setup-pnpm
-      uses: pnpm/setup@c9883cc79df532ad1a7b81bf9ab944ceb090d65c # v2.0.0
+      uses: pnpm/setup@84cb39b217b10273981911c288cd62326dc7c6d2 # v2.0.2
       with:
-        cache: true
+        cache: "true"
         install: ${{ inputs.install }}
-
-    - name: Setup Node.js (CI)
-      id: setup-node
-      uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
-      with:
-        node-version-file: package.json
-
-    - shell: bash
-      run: pnpm i @actions/core @actions/github @octokit/auth-app --filter=@root/github
 
     - name: Create GitHub token
       id: create-github-token
@@ -52,13 +43,3 @@ runs:
         private-key: ${{ inputs.private-key }}
         permission-contents: ${{ inputs.permission-contents }}
         permission-pull-requests: ${{ inputs.permission-pull-requests }}
-
-    - shell: bash
-      run: pnpm i @actions/core @actions/github --filter=@root/github
-
-    - name: Configure Git Identity
-      id: configure-git-identity
-      uses: ./.github/actions/configure-git-identity
-      with:
-        token: ${{ steps.create-github-token.outputs.token }}
-        app-slug: ${{ steps.create-github-token.outputs.app-slug }}

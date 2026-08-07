@@ -11,8 +11,8 @@
     "typecheck": "tsc -b --noEmit"
   },
   "devDependencies": {
-    "@root/tsconfig": "workspace:*",
-    "postcss-responsive-hints": "workspace:*",
+    "tsconfig": "*",
+    "postcss-responsive-hints": "*",
     "vite": "catalog:dev"
   }
 }

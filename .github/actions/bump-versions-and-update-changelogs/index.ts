@@ -1,4 +1,4 @@
-import {getInput, setFailed} from "@actions/core";
+import { getInput, setFailed } from "@actions/core";
 import { exec, getExecOutput } from "@actions/exec";
 
 try {

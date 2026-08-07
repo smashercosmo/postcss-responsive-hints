@@ -1,0 +1,42 @@
+name: Guard Release PR
+
+on:
+  pull_request:
+    types:
+      - opened
+    branches:
+      - main
+
+jobs:
+  guard:
+    name: Prevents creating release PR manually
+    environment: release
+    runs-on: ubuntu-latest
+    if: github.event.pull_request.head.ref == vars.RELEASE_BRANCH_NAME
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v7.0.1
+        with:
+          ref: main
+          persist-credentials: false
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            pnpm-workspace.yaml
+            pnpm-lock.yaml
+            package.json
+            .github
+
+      - uses: ./.github/actions/setup
+        id: setup
+        with:
+          app-id: ${{ vars.RELEASE_BOT_APP_ID }}
+          private-key: ${{ secrets.RELEASE_BOT_PRIVATE_KEY }}
+          permission-contents: read
+          permission-pull-requests: read
+          install: true
+
+      - uses: ./.github/actions/guard-release-pr
+        with:
+          token: ${{ steps.setup.outputs.token }}
+          release-branch: ${{ vars.RELEASE_BRANCH_NAME  }}
