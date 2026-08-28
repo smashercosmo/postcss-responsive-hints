@@ -14,6 +14,7 @@
     "@root/tsconfig": "workspace:*",
     "@types/http-proxy": "catalog:types",
     "@verdaccio/types": "catalog:types",
+    "better-typescript": "catalog:types",
     "http-proxy": "catalog:dev",
     "msw": "catalog:dev",
     "type-fest": "catalog:types"

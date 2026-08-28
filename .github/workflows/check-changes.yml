@@ -1,0 +1,52 @@
+name: Check Changes
+
+permissions: {}
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+on:
+  pull_request:
+    types:
+      - opened
+      - reopened
+      - synchronize
+    branches:
+      - main
+
+jobs:
+  check-for-pending-change-files:
+    name: Checks for pending change files. Every PR (except for the release one) must have them.
+    runs-on: ubuntu-latest
+    if: ${{ github.event.pull_request.head.ref != vars.RELEASE_BRANCH_NAME }}
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          fetch-depth: 1
+
+      - name: Show resolved branches
+        run: |
+          echo "Base branch: ${{ github.event.pull_request.base.ref }}"
+          echo "Head branch: ${{ github.event.pull_request.head.ref }}"
+          echo "Workspace: ${{ env.GITHUB_WORKSPACE }}"
+
+      - uses: pnpm/setup@703c52620218391530e48b9e8870d5c0082e1b9b # v2.1.0
+        with:
+          install: false
+
+      - id: check
+        uses: ./.github/actions/check-for-pending-change-files
+
+      - name: success
+        if: ${{ steps.check.outputs.has-pending-change-files == 'true' }}
+        run: echo '::notice::Submitted PR contains pending change files. Ready to proceed to the next step.'
+
+      - name: failure
+        if: ${{ steps.check.outputs.has-pending-change-files != 'true' }}
+        run: |
+          echo '::error::No pending change files found in the submitted PR. Please run `pnpm change` and push the generated change files.'
+          exit 1

@@ -33,7 +33,7 @@ jobs:
         with:
           persist-credentials: false
 
-      - uses: pnpm/setup@84cb39b217b10273981911c288cd62326dc7c6d2 # v2.0.2
+      - uses: pnpm/setup@703c52620218391530e48b9e8870d5c0082e1b9b # v2.1.0
         with:
           install: false
 
@@ -47,6 +47,7 @@ jobs:
         run: |
           echo "::error::No pending change files found in the submitted PR. Please run `pnpm change` and push the generated change files."
           exit 1
+
 
   # This job always runs, independent of the changeset check's outcome, so that a
   # missing changeset (which blocks merge on its own via a required status check on
@@ -69,7 +70,7 @@ jobs:
         with:
           persist-credentials: false
 
-      - uses: pnpm/setup@84cb39b217b10273981911c288cd62326dc7c6d2 # v2.0.2
+      - uses: pnpm/setup@703c52620218391530e48b9e8870d5c0082e1b9b # v2.1.0
         with:
           cache: true
           install: true
@@ -94,6 +95,7 @@ jobs:
           echo "::error::It is forbidden to create release PRs manually. Release process should be handled by the release bot."
           exit 1
 
+
   lint:
     name: Runs eslint and oxlint checks
     needs: [check-for-pending-change-files, guard-against-manual-release]
@@ -112,7 +114,7 @@ jobs:
         with:
           persist-credentials: false
 
-      - uses: pnpm/setup@84cb39b217b10273981911c288cd62326dc7c6d2 # v2.0.2
+      - uses: pnpm/setup@703c52620218391530e48b9e8870d5c0082e1b9b # v2.1.0
         with:
           cache: true
           install: true
@@ -134,7 +136,7 @@ jobs:
         with:
           persist-credentials: false
 
-      - uses: pnpm/setup@84cb39b217b10273981911c288cd62326dc7c6d2 # v2.0.2
+      - uses: pnpm/setup@703c52620218391530e48b9e8870d5c0082e1b9b # v2.1.0
         with:
           cache: true
           install: true

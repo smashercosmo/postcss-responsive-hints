@@ -3,7 +3,7 @@ import type { ExecFileSyncOptions } from "node:child_process";
 import {
   ActExecStatus,
   ActRunner,
-  ActWorkflowExecResult,
+  type ActWorkflowExecResult,
 } from "@pshevche/act-test-runner";
 import fs from "node:fs";
 import os from "node:os";
@@ -73,7 +73,7 @@ function createActRunner({
         state: "open",
       },
     })
-    .withWorkflowFile(workflowPath)
+    .withWorkflow({ file: workflowPath })
     .withAdditionalArgs(...args.flatMap(item => item))
     .forwardOutput();
 }

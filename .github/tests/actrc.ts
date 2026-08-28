@@ -21,36 +21,19 @@ export function getActArgs({
 }) {
   return [
     ["-P", `ubuntu-latest=${CUSTOM_ACT_IMAGE}:latest`],
-    ["--detect-event"],
     ["--action-offline-mode"],
     ["--network", "bridge"],
-    ["--cache-server-path", "/tmp/act-cache"],
-    ["--cache-server-addr", "0.0.0.0"],
-    ["--cache-server-port", String(CACHE_SERVER_PORT)],
     [
       "--cache-server-external-url",
       `http://host.docker.internal:${CACHE_SERVER_PORT}`,
     ],
     ["--use-gitignore"],
-    ["--env", "GITHUB_API_URL=http://host.docker.internal:9999"],
-    ["--env", "GIT_CONFIG_COUNT=1"],
-    ["--env", `GIT_CONFIG_KEY_0=url.${originTmpDir}.insteadOf`],
-    [
-      "--env",
-      "GIT_CONFIG_VALUE_0=https://github.com/smashercosmo/postcss-responsive-hints",
-    ],
-    ["--env", "GITHUB_SERVER_URL=https://github.com"],
-    ["--env", "GITHUB_REPOSITORY=smashercosmo/postcss-responsive-hints"],
-    ["--var", "RELEASE_BOT_APP_ID=some-app-id"],
-    ["--var", `RELEASE_BRANCH_NAME=${RELEASE_BRANCH_NAME}`],
-    ["--var", `FEATURE_BRANCH_NAME=${FEATURE_BRANCH_NAME}`],
-    ["--secret", `RELEASE_BOT_PRIVATE_KEY=${DUMMY_PRIVATE_KEY}`],
-    ["--secret", "GITHUB_TOKEN=dummy-local-token"],
-    ["--json"],
-    ["--bind"],
+/*    ["--json"],*/
+    ["--pull"],
     ["--verbose"],
     ["--no-skip-checkout"],
     ["--directory", repoTmpDir],
     ["--container-options", `-v ${originTmpDir}:${originTmpDir}`],
+    ["--container-architecture", `linux/amd64`],
   ];
 }

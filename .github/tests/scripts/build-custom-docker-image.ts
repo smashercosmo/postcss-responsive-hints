@@ -70,7 +70,7 @@ export function buildCustomDockerImage() {
   } else {
     console.info(`Building ${image}...`);
     child_process.execSync(
-      `docker build -t ${image} -f ${dockerfile} ${dockerfileDir}`,
+      `docker build --platform linux/amd64 -t ${image} -f ${dockerfile} ${dockerfileDir}`,
       {
         stdio: "inherit",
       },
