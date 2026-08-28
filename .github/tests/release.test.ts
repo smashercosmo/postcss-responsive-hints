@@ -80,7 +80,11 @@ function createActRunner({ branch }: { branch: string }): ActRunner {
     .toString()
     .trim();
 
-  child_process.execFileSync("git", ["push", "origin", `${commitSha}:refs/pull/10/merge`], options);
+  child_process.execFileSync(
+    "git",
+    ["push", "origin", `${commitSha}:refs/pull/10/merge`],
+    options,
+  );
 
   return new ActRunner()
     .withEvent("pull_request", {

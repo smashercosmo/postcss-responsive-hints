@@ -1,6 +1,5 @@
 name: Spin up virtual package registry
-description:
-  GitHub Actions that spins up virtual package registry server
+description: GitHub Actions that spins up virtual package registry server
   to work around limitations `pnpm version` command limitations.
   It won't bump package version and generate changelog, if the package
   hasn't been published.

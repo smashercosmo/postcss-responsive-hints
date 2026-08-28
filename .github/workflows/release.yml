@@ -1,5 +1,11 @@
 name: Release Workflow
 
+permissions: {}
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 on:
   pull_request:
     types:
@@ -9,6 +15,7 @@ on:
 
 jobs:
   check-for-pending-change-files:
+    name: Checks for pending change files. Every PR (except for the release one) must have them.
     environment: release
     runs-on: ubuntu-latest
     outputs:
@@ -37,6 +44,7 @@ jobs:
           )}}
 
   version-bumps-and-changelog-updates:
+    name: Bumps versions and update changelogs based on the pending change files
     needs: check-for-pending-change-files
     if: needs.check-for-pending-change-files.outputs.has-pending-change-files == 'true'
     environment: release

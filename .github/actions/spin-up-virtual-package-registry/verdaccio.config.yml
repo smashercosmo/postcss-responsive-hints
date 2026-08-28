@@ -7,7 +7,7 @@ uplinks:
     url: https://registry.npmjs.org/
 
 packages:
-  '@root/*':
+  "@root/*":
     access: $all
     publish: $all
     unpublish: $all

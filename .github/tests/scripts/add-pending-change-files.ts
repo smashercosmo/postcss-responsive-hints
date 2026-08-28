@@ -15,7 +15,11 @@ export function addPendingChangeFiles({
   summary: string;
 }) {
   child_process.execFileSync("git", ["checkout", branch], options);
-  child_process.execFileSync("pnpm", ["change", "--bump", bump, "--summary", summary, pkg], options);
+  child_process.execFileSync(
+    "pnpm",
+    ["change", "--bump", bump, "--summary", summary, pkg],
+    options,
+  );
   child_process.execFileSync("git", ["add", "."], options);
 
   const status = child_process

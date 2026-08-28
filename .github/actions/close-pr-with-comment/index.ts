@@ -4,7 +4,10 @@ import { context, getOctokit } from "@actions/github";
 try {
   const octokit = getOctokit(getInput("token", { required: true }));
   const comment = getInput("comment", { required: true });
-  const number = Number.parseInt(getInput("pull-request-number", { required: true }), 10);
+  const number = Number.parseInt(
+    getInput("pull-request-number", { required: true }),
+    10,
+  );
 
   await octokit.rest.issues.createComment({
     body: comment,

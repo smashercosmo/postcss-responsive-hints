@@ -1,3 +1,5 @@
+import type { ExecFileSyncOptions } from "node:child_process";
+
 import {
   ActExecStatus,
   ActRunner,
@@ -13,7 +15,6 @@ import { FEATURE_BRANCH_NAME, getActArgs } from "./actrc.ts";
 import { addPendingChangeFiles } from "./scripts/add-pending-change-files.ts";
 import { createMockGitRepo } from "./scripts/create-mock-git-repo.ts";
 import { server } from "./scripts/create-mock-github-server";
-import type { ExecFileSyncOptions } from 'node:child_process'
 
 const tmpDirs: Array<string> = [];
 
@@ -69,7 +70,7 @@ function createActRunner({
         base: { ref: "main" },
         head: { ref: `${branch}` },
         number: 10,
-        state: "open"
+        state: "open",
       },
     })
     .withWorkflowFile(workflowPath)

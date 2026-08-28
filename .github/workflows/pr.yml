@@ -17,6 +17,7 @@ on:
 
 jobs:
   check-for-pending-change-files:
+    name: Checks for pending change files. Every PR (except for the release one) must have them.
     runs-on: ubuntu-latest
     outputs:
       has-pending-change-files: ${{ steps.check.outputs.has-pending-change-files }}
@@ -44,13 +45,14 @@ jobs:
 
       - if: ${{ steps.check.outputs.has-pending-change-files != 'true' }}
         run: |
-          echo '::error::No pending change files found in the submitted PR. Please run `pnpm change` and push the generated change files.'
+          echo "::error::No pending change files found in the submitted PR. Please run `pnpm change` and push the generated change files."
           exit 1
 
   # This job always runs, independent of the changeset check's outcome, so that a
   # missing changeset (which blocks merge on its own via a required status check on
   # main) doesn't also block lint/test from giving fast feedback on the code itself.
   guard-against-manual-release:
+    name: Prevents the manual creation of the release PR
     environment: release
     runs-on: ubuntu-latest
     env:
@@ -89,10 +91,11 @@ jobs:
 
       - if: ${{ env.IS_MANUAL_RELEASE == 'true' }}
         run: |
-          echo '::error::It is forbidden to create release PRs manually. Release process should be handled by the release bot.'
+          echo "::error::It is forbidden to create release PRs manually. Release process should be handled by the release bot."
           exit 1
 
   lint:
+    name: Runs eslint and oxlint checks
     needs: [check-for-pending-change-files, guard-against-manual-release]
     # Run whenever this isn't a manual release, independent of check-for-pending-change-files'
     # result. That job blocks merge on its own (as a required status check on main); we don't
@@ -117,6 +120,7 @@ jobs:
       - run: pnpm lint
 
   test:
+    name: Runs tests (except for the github actions tests)
     needs: [check-for-pending-change-files, guard-against-manual-release]
     if: |
       always() &&
