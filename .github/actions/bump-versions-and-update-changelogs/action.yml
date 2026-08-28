@@ -3,11 +3,16 @@ description: GitHub Action for bumping versions and updating changelogs based on
 
 inputs:
   release-branch-name:
-    description: Branch to commit updated package.json and changelog files
+    description: Branch to commit updated package.json and changelog files to
     required: true
   private-registry-url:
     description: Registry to publish private packages to
     required: true
+
+outputs:
+  status:
+    description: Information about updated packages
+
 
 runs:
   using: node24

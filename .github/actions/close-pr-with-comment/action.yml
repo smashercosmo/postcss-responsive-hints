@@ -1,0 +1,17 @@
+name: Close Pull Request With Comment
+description: GitHub Action that automatically closes pull requests without merge with descriptive comment
+
+inputs:
+  token:
+    description: GitHub installation access token
+    required: true
+  pull-request-number:
+    description: Pull request number
+    required: true
+  comment:
+    description: Descriptive comment explaining why this PR was automatically closed
+    required: true
+
+runs:
+  using: node24
+  main: index.ts

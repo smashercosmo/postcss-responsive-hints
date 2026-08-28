@@ -1,0 +1,17 @@
+name: Spin up virtual package registry
+description:
+  GitHub Actions that spins up virtual package registry server
+  to work around limitations `pnpm version` command limitations.
+  It won't bump package version and generate changelog, if the package
+  hasn't been published.
+
+outputs:
+  registry-server-url:
+    description: Virtual package registry url
+  registry-server-process-pid:
+    description: Virtual package registry server process pid
+
+runs:
+  using: node24
+  main: index.ts
+  post: post.ts

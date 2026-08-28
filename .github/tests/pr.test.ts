@@ -13,7 +13,7 @@ import { FEATURE_BRANCH_NAME, getActArgs } from "./actrc.ts";
 import { addPendingChangeFiles } from "./scripts/add-pending-change-files.ts";
 import { createMockGitRepo } from "./scripts/create-mock-git-repo.ts";
 import { server } from "./scripts/create-mock-github-server";
-import { getSha } from './scripts/getSha'
+import type { ExecFileSyncOptions } from 'node:child_process'
 
 const tmpDirs: Array<string> = [];
 
@@ -41,11 +41,13 @@ function createActRunner({
     repoTmpDir,
   });
 
+  const options: ExecFileSyncOptions = { cwd: repoTmpDir, encoding: "utf8" };
+
   if (shouldGenerateChangeFiles) {
     addPendingChangeFiles({
       branch,
       bump: "major",
-      git_dir: repoTmpDir,
+      options,
       pkg: "postcss-responsive-hints",
       summary: "a lot of breaking changes",
     });
@@ -53,22 +55,21 @@ function createActRunner({
     addPendingChangeFiles({
       branch,
       bump: "minor",
-      git_dir: repoTmpDir,
+      options,
       pkg: "@root/shared",
       summary: "better code",
     });
   }
 
-  const headSha = getSha({ branch, git_dir: originTmpDir });
-  const baseSha = getSha({ branch: "main", git_dir: originTmpDir });
-
   return new ActRunner()
     .withEvent("pull_request", {
-      number: 1,
+      action: "opened",
+      number: 10,
       pull_request: {
-        base: { ref: "main", sha: baseSha },
-        head: { ref: `${branch}`, sha: headSha },
-        number: 1,
+        base: { ref: "main" },
+        head: { ref: `${branch}` },
+        number: 10,
+        state: "open"
       },
     })
     .withWorkflowFile(workflowPath)

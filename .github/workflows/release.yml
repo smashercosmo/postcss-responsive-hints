@@ -1,4 +1,4 @@
-name: Release
+name: Release Workflow
 
 on:
   pull_request:
@@ -19,32 +19,22 @@ jobs:
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
+          ref: ${{ github.event.pull_request.merge_commit_sha }}
           persist-credentials: false
 
-      - uses: ./.github/actions/setup
-        id: setup
+      - uses: pnpm/setup@84cb39b217b10273981911c288cd62326dc7c6d2 # v2.0.2
         with:
-          app-id: ${{ vars.RELEASE_BOT_APP_ID }}
-          private-key: ${{ secrets.RELEASE_BOT_PRIVATE_KEY }}
-          permission-contents: read
-          permission-pull-requests: write
-          install: true
+          install: false
 
       - id: check
         uses: ./.github/actions/check-for-pending-change-files
 
-  require-pending-change-files:
-    needs: check-for-pending-change-files
-    outputs:
-      has-pending-change-files: ${{ needs.check-for-pending-change-files.outputs.has-pending-change-files }}
-    environment: release
-    runs-on: ubuntu-latest
-    if: needs.check-for-pending-change-files.outputs.has-pending-change-files == 'false'
-    steps:
       - run: |
-          echo "::error::No pending change files found. Please run 'pnpm change' and push the generated change files."
-          exit 1
-
+          echo ${{ case(
+            steps.check.outputs.has-pending-change-files == 'true',
+            '::notice::Main branch has pending change files. Ready to proceed to the next step.',
+            '::warning::No pending change files found on the main branch. Please run 'pnpm change' and push the generated change files.'
+          )}}
 
   version-bumps-and-changelog-updates:
     needs: check-for-pending-change-files
@@ -56,28 +46,21 @@ jobs:
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          ref: ${{ github.event.pull_request.base.ref }}
+          ref: ${{ github.event.pull_request.merge_commit_sha }}
           persist-credentials: false
 
-      - uses: ./.github/actions/setup
-        id: setup
+      - uses: pnpm/setup@84cb39b217b10273981911c288cd62326dc7c6d2 # v2.0.2
         with:
-          app-id: ${{ vars.RELEASE_BOT_APP_ID }}
-          private-key: ${{ secrets.RELEASE_BOT_PRIVATE_KEY }}
-          permission-contents: read
-          permission-pull-requests: write
-          install: true
+          cache: true
+          install: false
 
-      - uses: ./.github/actions/spin-up-verdaccio-server
-        id: verdaccio-server
+      - uses: ./.github/actions/spin-up-virtual-package-registry
+        id: registry
 
       - uses: ./.github/actions/bump-versions-and-update-changelogs
         id: version
         with:
           release-branch-name: ${{ vars.RELEASE_BRANCH_NAME }}
-          private-registry-url: ${{ steps.verdaccio-server.outputs.url }}
+          virtual-registry-server-url: ${{ steps.registry.outputs.registry-server-url }}
 
-
-
-
-
+      - run: echo ${{ secrets.version.outputs.status }}

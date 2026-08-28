@@ -1,4 +1,7 @@
-storage: ./.verdaccio
+store:
+  memory:
+    limit: 1000
+
 uplinks:
   npmjs:
     url: https://registry.npmjs.org/
@@ -8,3 +11,6 @@ packages:
     access: $all
     publish: $all
     unpublish: $all
+  "**":
+    access: $all
+    proxy: npmjs

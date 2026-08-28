@@ -53,8 +53,8 @@ export function runRegistry() {
 try {
   const pid = await runRegistry();
   info(`Verdaccio server started on port ${PORT}`);
-  setOutput("pid", pid);
-  setOutput("url", `http://localhost:${PORT}`);
+  setOutput("registry-server-process-pid", pid);
+  setOutput("registry-server-url", `http://localhost:${PORT}`);
 } catch (error) {
   if (error instanceof Error) {
     setFailed(error.message);

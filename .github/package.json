@@ -10,14 +10,13 @@
     "@mswjs/http-middleware": "catalog:dev",
     "@octokit/types": "catalog:types",
     "@octokit/webhooks-types": "catalog:types",
-    "@pshevche/act-test-runner": "catalog:dev",
+    "@pshevche/act-test-runner": "catalog:test",
     "@root/tsconfig": "workspace:*",
     "@types/http-proxy": "catalog:types",
     "@verdaccio/types": "catalog:types",
     "http-proxy": "catalog:dev",
     "msw": "catalog:dev",
-    "type-fest": "catalog:types",
-    "typescript": "catalog:dev"
+    "type-fest": "catalog:types"
   },
   "dependencies": {
     "@actions/core": "catalog:actions",
@@ -25,6 +24,7 @@
     "@actions/github": "catalog:actions",
     "@octokit/auth-app": "catalog:actions",
     "@octokit/plugin-rest-endpoint-methods": "catalog:actions",
-    "verdaccio": "catalog:dev"
+    "verdaccio": "catalog:actions",
+    "verdaccio-memory": "catalog:actions"
   }
 }

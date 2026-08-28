@@ -3,7 +3,7 @@ import {
   ActRunner,
   ActWorkflowExecResult,
 } from "@pshevche/act-test-runner";
-import child_process, { type ExecSyncOptions } from "node:child_process";
+import child_process, { type ExecFileSyncOptions } from "node:child_process";
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
@@ -14,7 +14,6 @@ import { FEATURE_BRANCH_NAME, getActArgs } from "./actrc.ts";
 import { addPendingChangeFiles } from "./scripts/add-pending-change-files.ts";
 import { createMockGitRepo } from "./scripts/create-mock-git-repo.ts";
 import { server } from "./scripts/create-mock-github-server";
-import { getSha } from "./scripts/getSha";
 
 const tmpDirs: Array<string> = [];
 
@@ -36,7 +35,7 @@ function createActRunner({ branch }: { branch: string }): ActRunner {
     repoTmpDir,
   });
 
-  const options: ExecSyncOptions = { cwd: repoTmpDir, encoding: "utf8" };
+  const options: ExecFileSyncOptions = { cwd: repoTmpDir, encoding: "utf8" };
 
   addPendingChangeFiles({
     branch,
@@ -54,8 +53,34 @@ function createActRunner({ branch }: { branch: string }): ActRunner {
     summary: "better code",
   });
 
-  child_process.execSync(`git merge ${branch} --no-ff`, options);
-  child_process.execSync("git push --all", options);
+  const treeSha = child_process
+    .execFileSync(
+      "git",
+      ["merge-tree", "--write-tree", "main", branch],
+      options,
+    )
+    .toString()
+    .trim();
+
+  const commitSha = child_process
+    .execFileSync(
+      "git",
+      [
+        "commit-tree",
+        treeSha,
+        "-p",
+        "main",
+        "-p",
+        branch,
+        "-m",
+        `Merge branch ${branch} into main`,
+      ],
+      options,
+    )
+    .toString()
+    .trim();
+
+  child_process.execFileSync("git", ["push", "origin", `${commitSha}:refs/pull/10/merge`], options);
 
   return new ActRunner()
     .withEvent("pull_request", {
@@ -68,22 +93,14 @@ function createActRunner({ branch }: { branch: string }): ActRunner {
         head: {
           ref: `${branch}`,
         },
-        id: 666,
+        merge_commit_sha: commitSha,
         merged: true,
         number: 10,
         state: "closed",
       },
     })
     .withWorkflowFile(workflowPath)
-    .withAdditionalArgs(
-      ...args
-        .flatMap(item => item)
-        .concat("--env", "GITHUB_REF=refs/remotes/pull/10/merge")
-        .concat(
-          "--env",
-          `GITHUB_SHA=${getSha({ branch: "main", git_dir: repoTmpDir })}`,
-        ),
-    )
+    .withAdditionalArgs(...args.flatMap(item => item))
     .forwardOutput();
 }
 
@@ -95,9 +112,9 @@ beforeAll(() => {
 
 afterAll(() => {
   actRunnerInProgress?.finally(() => server.close());
-  /*tmpDirs.forEach(tmpDir => {
+  tmpDirs.forEach(tmpDir => {
     fs.rmSync(tmpDir, { force: true, recursive: true });
-  });*/
+  });
 });
 
 describe("Release workflow", () => {
