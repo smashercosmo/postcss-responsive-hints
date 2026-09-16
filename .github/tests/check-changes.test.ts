@@ -1,210 +1,156 @@
-import {
-  ActExecStatus,
-  ActRunner,
-  type ActWorkflowExecResult,
-} from "@pshevche/act-test-runner";
-import child_process, { type ExecFileSyncOptions } from "node:child_process";
+import { ActExecStatus, ActRunner } from "act-test-runner";
+import child_process from "node:child_process";
 import fs from "node:fs";
-import os from "node:os";
-import path from "node:path";
 import url from "node:url";
-import { describe, expect, it, afterAll, beforeAll } from "vitest";
+import { describe, expect, it, beforeAll, afterAll } from "vitest";
 
-import { FEATURE_BRANCH_NAME, getActArgs, RELEASE_BRANCH_NAME } from "./actrc";
+import {
+  FEATURE_BRANCH_NAME,
+  getAdditionalArgs,
+  getCacheServerArgs,
+  getEnvs,
+  getSecrets,
+} from "./actrc";
 import { addPendingChangeFiles } from "./scripts/add-pending-change-files";
 import { createMockGitRepo } from "./scripts/create-mock-git-repo";
 import { server } from "./scripts/create-mock-github-server";
+import { createMockPullRequest } from "./scripts/create-mock-pull-request.ts";
 import { OutputListener } from "./scripts/output-listener";
+import { addEmptyCommit } from './scripts/add-empty-commit.ts'
 
-const tmpDirs: Array<string> = [];
+let tmpDirs: Array<string> = [];
+let outputListeners: OutputListener[] = [];
+let abourtControllers: AbortController[] = [];
 
 const workflowPath = url.fileURLToPath(
   import.meta.resolve("../workflows/check-changes.yml"),
 );
-
-const CACHE_SERVER_PORT = 61_321;
-
-function createActRunner({
-  branch,
-  shouldGenerateChangeFiles,
-}: {
-  branch: string;
-  shouldGenerateChangeFiles: boolean;
-}): ActRunner {
-  const repoTmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "act-repo-"));
-  const originTmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "act-origin-"));
-
-  tmpDirs.push(repoTmpDir);
-  tmpDirs.push(originTmpDir);
-
-  createMockGitRepo({ originTmpDir, repoTmpDir });
-
-  const args = getActArgs({
-    originTmpDir,
-    repoTmpDir,
-  });
-
-  const options: ExecFileSyncOptions = { cwd: originTmpDir, encoding: "utf8" };
-  let commitSha: string;
-
-  if (shouldGenerateChangeFiles) {
-    addPendingChangeFiles({
-      branch,
-      bump: "major",
-      options,
-      pkg: "postcss-responsive-hints",
-      summary: "a lot of breaking changes",
-    });
-
-    addPendingChangeFiles({
-      branch,
-      bump: "minor",
-      options,
-      pkg: "@root/shared",
-      summary: "better code",
-    });
-
-    const treeSha = child_process
-      .execFileSync(
-        "git",
-        ["merge-tree", "--write-tree", "main", branch],
-        options,
-      )
-      .toString()
-      .trim();
-
-    commitSha = child_process
-      .execFileSync(
-        "git",
-        [
-          "commit-tree",
-          treeSha,
-          "-p",
-          "main",
-          "-p",
-          branch,
-          "-m",
-          `Merge branch ${branch} into main`,
-        ],
-        options,
-      )
-      .toString()
-      .trim();
-
-    child_process.execFileSync(
-      "git",
-      ["update-ref", "refs/pull/10/merge", commitSha],
-      options,
-    );
-  }
-
-  return new ActRunner()
-    .withEvent("pull_request", {
-      action: "opened",
-      number: 10,
-      pull_request: {
-        base: { ref: "main" },
-        head: { ref: branch },
-        number: 10,
-        state: "open",
-      },
-    })
-    .withCacheServer({
-      path: "/tmp/act-cache",
-      host: "0.0.0.0",
-      port: CACHE_SERVER_PORT,
-    })
-    .withSecrets({
-      values: {
-        RELEASE_BOT_PRIVATE_KEY: "DUMMY_PRIVATE_KEY",
-        GITHUB_TOKEN: "DUMMY_TOKEN",
-      },
-    })
-    .withVariables({
-      values: {
-        RELEASE_BOT_APP_ID: "some-app-id",
-        RELEASE_BRANCH_NAME: `${RELEASE_BRANCH_NAME}`,
-        FEATURE_BRANCH_NAME: `${FEATURE_BRANCH_NAME}`,
-      },
-    })
-    .withEnv({
-      values: {
-        GITHUB_API_URL: "http://host.docker.internal:9999",
-        GIT_CONFIG_COUNT: "2",
-        GIT_CONFIG_KEY_0: `url.${originTmpDir}.insteadOf`,
-        GIT_CONFIG_VALUE_0:
-          "https://github.com/smashercosmo/postcss-responsive-hints.git",
-        GIT_CONFIG_KEY_1: `remote.origin.fetch`,
-        GIT_CONFIG_VALUE_1: "+refs/*:refs/*",
-        GITHUB_SERVER_URL: "https://github.com",
-        GITHUB_REPOSITORY: "smashercosmo/postcss-responsive-hints",
-      },
-    })
-    .withWorkflow({ file: workflowPath })
-    .withAdditionalArgs(...args.flatMap(item => item));
-}
-
-let actRunnerInProgress: Promise<ActWorkflowExecResult>;
-let outputListener = new OutputListener({ streamOutput: true });
 
 beforeAll(() => {
   server.listen({ port: 9999 });
 });
 
 afterAll(() => {
-  actRunnerInProgress?.finally(() => {
-    server.close();
-  });
-  /*tmpDirs.forEach(tmpDir => {
+  tmpDirs.forEach(tmpDir => {
     fs.rmSync(tmpDir, { force: true, recursive: true });
-  });*/
-  outputListener.clear();
+  });
+  outputListeners.forEach(listener => {
+    listener.clear();
+  });
+  abourtControllers.forEach(controller => {
+    controller.abort();
+  });
+  server.close();
+  tmpDirs.length = 0;
+  outputListeners.length = 0;
+  abourtControllers.length = 0;
 });
 
 describe("Check Changes", () => {
-  describe("Feature PR workflow", () => {
-    it.skip("should fail when feature PR does not have generated changesets", async () => {
-      actRunnerInProgress = createActRunner({
-        branch: FEATURE_BRANCH_NAME,
-        shouldGenerateChangeFiles: false,
-      })
-        .forwardOutput(outputListener)
-        .run();
+  it("should fail when feature PR does not have generated changesets", async () => {
+    const { localRepoTmpDir, remoteRepoTmpDir } = createMockGitRepo();
+    tmpDirs.push(localRepoTmpDir);
+    tmpDirs.push(remoteRepoTmpDir);
 
-      const { status } = await actRunnerInProgress;
+    addEmptyCommit({ repo: localRepoTmpDir, branch: FEATURE_BRANCH_NAME })
 
-      console.log(outputListener.entries[0].message);
+    const pullRequestEvent = createMockPullRequest({
+      repo: localRepoTmpDir,
+      branch: FEATURE_BRANCH_NAME,
+    });
 
-      expect(outputListener.entries.length).toBe(1);
-      expect(outputListener.entries[0].message).toBe(
-        "No pending change files found in the submitted PR. Please run `pnpm change` and push the generated change files.",
-      );
-      expect(outputListener.entries[0].step).toBe("failure");
-      expect(outputListener.entries[0].job).toBe(
-        "check-for-pending-change-files",
-      );
-      expect(status).toBe(ActExecStatus.FAILED);
-    }, 140_000);
+    const outputListener = new OutputListener({
+      streamOutput: false,
+      filter(entry) {
+        return (
+          entry.step?.name === "failure" && entry.message.includes("::error::")
+        );
+      },
+    });
+    outputListeners.push(outputListener);
 
-    it("should succeed when feature PR has generated changesets", async () => {
-      actRunnerInProgress = createActRunner({
-        branch: FEATURE_BRANCH_NAME,
-        shouldGenerateChangeFiles: true,
-      })
-        .forwardOutput(outputListener)
-        .run();
+    const controller = new AbortController();
+    abourtControllers.push(controller);
 
-      const { status } = await actRunnerInProgress;
+    const { status } = await new ActRunner()
+      .withEvent("pull_request", pullRequestEvent)
+      .withCacheServer(getCacheServerArgs())
+      .withWorkflow({ file: workflowPath })
+      .withEnvs(getEnvs({ remoteRepoTmpDir }))
+      .withSecrets(getSecrets())
+      .withAdditionalArgs(
+        ...getAdditionalArgs({
+          remoteRepoTmpDir,
+          localRepoTmpDir,
+        }),
+      )
+      .forwardOutput(outputListener)
+      .run({ signal: controller.signal });
 
-      expect(outputListener.entries.length).toBe(1);
-      expect(outputListener.entries[0].message).toBe(
-        "Submitted PR contains pending change files. Ready to proceed to the next step.",
-      );
-      expect(outputListener.entries[0].step).toBe("success");
-      expect(outputListener.entries[0].job).toBe(
-        "check-for-pending-change-files",
-      );
-      expect(status).toBe(ActExecStatus.SUCCESS);
-    }, 140_000);
-  });
+    expect(outputListener.entries.length).toBe(1);
+    expect(outputListener.entries[0].message).toBe(
+      "No pending change files found in the submitted PR. Please run `pnpm change` and push the generated change files.",
+    );
+    expect(status).toBe(ActExecStatus.FAILED);
+  }, 140_000);
+  it("should succeed when feature PR has generated changesets", async () => {
+    const { localRepoTmpDir, remoteRepoTmpDir } = createMockGitRepo();
+    tmpDirs.push(localRepoTmpDir);
+    tmpDirs.push(remoteRepoTmpDir);
+
+    addPendingChangeFiles({
+      branch: FEATURE_BRANCH_NAME,
+      bump: "major",
+      repo: localRepoTmpDir,
+      pkg: "postcss-responsive-hints",
+      summary: "a lot of breaking changes",
+    });
+
+    addPendingChangeFiles({
+      branch: FEATURE_BRANCH_NAME,
+      bump: "minor",
+      repo: localRepoTmpDir,
+      pkg: "@root/shared",
+      summary: "better code",
+    });
+
+    const pullRequestEvent = createMockPullRequest({
+      repo: localRepoTmpDir,
+      branch: FEATURE_BRANCH_NAME,
+    });
+
+    const outputListener = new OutputListener({
+      streamOutput: false,
+      filter(entry) {
+        return (
+          entry.step?.name === "success" && entry.message.includes("::notice::")
+        );
+      },
+    });
+    outputListeners.push(outputListener);
+
+    const controller = new AbortController();
+    abourtControllers.push(controller);
+
+    const { status } = await new ActRunner()
+      .withEvent("pull_request", pullRequestEvent)
+      .withCacheServer(getCacheServerArgs())
+      .withWorkflow({ file: workflowPath })
+      .withEnvs(getEnvs({ remoteRepoTmpDir }))
+      .withSecrets(getSecrets())
+      .withAdditionalArgs(
+        ...getAdditionalArgs({
+          remoteRepoTmpDir,
+          localRepoTmpDir,
+        }),
+      )
+      .forwardOutput(outputListener)
+      .run({ signal: controller.signal });
+
+    expect(outputListener.entries.length).toBe(1);
+    expect(outputListener.entries[0].message).toBe(
+      "Submitted PR contains pending change files. Ready to proceed to the next step.",
+    );
+    expect(status).toBe(ActExecStatus.SUCCESS);
+  }, 140_000);
 });

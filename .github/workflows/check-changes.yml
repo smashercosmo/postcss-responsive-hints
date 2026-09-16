@@ -26,13 +26,6 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
-          fetch-depth: 1
-
-      - name: Show resolved branches
-        run: |
-          echo "Base branch: ${{ github.event.pull_request.base.ref }}"
-          echo "Head branch: ${{ github.event.pull_request.head.ref }}"
-          echo "Workspace: ${{ env.GITHUB_WORKSPACE }}"
 
       - uses: pnpm/setup@703c52620218391530e48b9e8870d5c0082e1b9b # v2.1.0
         with:

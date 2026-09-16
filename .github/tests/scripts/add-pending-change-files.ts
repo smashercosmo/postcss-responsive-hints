@@ -1,34 +1,30 @@
-import child_process, { type ExecFileSyncOptions } from "node:child_process";
+import child_process from "node:child_process";
 import os from "node:os";
 
 export function addPendingChangeFiles({
   branch,
   bump,
-  options,
+  repo,
   pkg,
   summary,
 }: {
   branch: string;
   bump: string;
-  options: ExecFileSyncOptions;
+  repo: string;
   pkg: string;
   summary: string;
 }) {
-  child_process.execFileSync("git", ["checkout", branch], options);
-  child_process.execFileSync(
-    "pnpm",
-    ["change", "--bump", bump, "--summary", summary, pkg],
-    options,
-  );
-  child_process.execFileSync("git", ["add", "."], options);
+  const exec = (command: string, args: string[]) =>
+    child_process
+      .execFileSync(command, args, { cwd: repo, encoding: "utf8" })
+      .toString()
+      .trim();
 
-  const status = child_process
-    .execFileSync("pnpm", ["change", "status"], options)
-    .toString()
-    .trim();
-
+  exec("git", ["checkout", branch]);
+  exec("pnpm", ["change", "--bump", bump, "--summary", summary, pkg]);
+  exec("git", ["add", "."]);
+  const status = exec("pnpm", ["change", "status"])
   const message = `docs: add pending change intents${os.EOL}${os.EOL}${status}`;
-
-  child_process.execFileSync("git", ["commit", "-m", message], options);
-  child_process.execFileSync("git", ["checkout", "main"], options);
+  exec("git", ["commit", "-m", message]);
+  exec("git", ["checkout", "main"]);
 }

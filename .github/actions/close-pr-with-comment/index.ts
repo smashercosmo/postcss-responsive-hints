@@ -1,4 +1,4 @@
-import { getInput, setFailed } from "@actions/core";
+import { getInput, info, setFailed } from "@actions/core";
 import { context, getOctokit } from "@actions/github";
 
 try {
@@ -16,12 +16,13 @@ try {
     repo: context.repo.repo,
   });
 
-  await octokit.rest.pulls.update({
+  const result = await octokit.rest.pulls.update({
     owner: context.repo.owner,
     pull_number: number,
     repo: context.repo.repo,
     state: "closed",
   });
+  info(`PR #${result.data?.number} is ${result.data.state}`);
 } catch (error) {
   if (error instanceof Error) {
     setFailed(error.message);

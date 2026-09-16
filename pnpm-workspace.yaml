@@ -6,7 +6,6 @@ packages:
 hoist: false
 saveExact: true
 cleanupUnusedCatalogs: true
-catalogMode: strict
 
 versioning:
   changelog:
@@ -14,7 +13,7 @@ versioning:
 
 catalogs:
   types:
-    "@types/node": 26.4.0
+    "@types/node": 26.5.1
     "@pnpm/types": 1102.1.0
     "@octokit/webhooks-types": 7.6.1
     "@octokit/types": 18.0.0
@@ -24,12 +23,11 @@ catalogs:
     better-typescript: 0.2.4
   test:
     vitest: 5.0.0
-    "@pshevche/act-test-runner": 2.0.0
   dev:
-    vite: 8.2.2
+    vite: 8.3.0
     typescript: 7.0.2
-    actions-up: 1.19.0
-    turbo: 2.10.12
+    actions-up: 1.20.0
+    turbo: 2.10.13
     clean-publish: 7.1.0
     tsdown: 0.23.0
     postcss: 8.5.28
@@ -37,7 +35,7 @@ catalogs:
     cz-conventional-changelog: 3.3.0
     "@commitlint/cli": 21.2.2
     "@commitlint/cz-commitlint": 21.2.2
-    oxfmt: 0.67.0
+    oxfmt: 0.68.0
     http-proxy: 1.18.1
     msw: 2.15.0
     "@mswjs/http-middleware": 0.10.3
@@ -50,7 +48,7 @@ catalogs:
     verdaccio: 6.10.3
     verdaccio-memory: 10.5.3
   lint:
-    oxlint: 1.82.0
+    oxlint: 1.83.0
     eslint: 10.10.0
     eslint-plugin-no-only-tests: 3.4.0
     eslint-plugin-perfectionist: 5.11.0
@@ -62,6 +60,3 @@ catalogs:
 allowBuilds:
   msw: true
   node: true
-
-minimumReleaseAgeExclude:
-  - '@pshevche/act-test-runner@2.0.0'

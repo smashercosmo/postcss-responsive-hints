@@ -24,7 +24,7 @@
     "format": "oxfmt",
     "lint": "oxlint",
     "lint:actions": "eslint .github/**/*.yml",
-    "deps:update": "pnpm up -r --latest --interactive --include-github-actions",
+    "deps:update": "pnpm up -r --latest --interactive",
     "deps:remove": "deps-remove",
     "deps:add": "deps-add",
     "actions:update": "actions-up"

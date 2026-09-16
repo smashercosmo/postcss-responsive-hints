@@ -150,12 +150,12 @@ const handlers = [
   }),
   octokitEndpointMethodToMswHandler({
     handler: api.rest.pulls.update,
-    response: {
-      html_url:
-        "https://github.com/smashercosmo/postcss-responsive-hints/pull/43",
-      number: 43,
-      state: "closed",
-      title: "Updated Pull Request Title",
+    response(data) {
+      console.log("data:", data);
+      return {
+        number: data?.pull_number,
+        state: data?.state
+      }
     },
   }),
 ];

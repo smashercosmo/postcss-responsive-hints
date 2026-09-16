@@ -1,0 +1,65 @@
+name: Guard Against Manual Release Workflow
+
+permissions: {}
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+on:
+  pull_request:
+    types:
+      - opened
+      - reopened
+      - synchronize
+    branches:
+      - main
+
+jobs:
+  # This job always runs, independent of the changeset check's outcome, so that a
+  # missing changeset (which blocks merge on its own via a required status check on
+  # main) doesn't also block lint/test from giving fast feedback on the code itself.
+  guard-against-manual-release:
+    name: Prevents the manual creation of the release PR
+    environment: release
+    runs-on: ubuntu-latest
+    env:
+      # Only release-bot can create/update/delete refs matching the release
+      # branch (enforced by repo ruleset), so this check is a workflow-level backstop to
+      # that platform-level restriction rather than the primary defense.
+      IS_MANUAL_RELEASE: ${{ github.event.pull_request.head.ref == vars.RELEASE_BRANCH_NAME && github.event.pull_request.user.type != 'Bot' }}
+    outputs:
+      is-manual-release: ${{ env.IS_MANUAL_RELEASE }}
+    permissions:
+      contents: read
+    steps:
+      - run: echo ${{ github.event.pull_request.head.ref == vars.RELEASE_BRANCH_NAME }}
+      - run: echo ${{ github.event.pull_request.user.type != 'Bot' }}
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - uses: pnpm/setup@703c52620218391530e48b9e8870d5c0082e1b9b # v2.1.0
+        with:
+          cache: true
+          install: true
+
+      - id: auth
+        if: ${{ env.IS_MANUAL_RELEASE == 'true' }}
+        uses: ./.github/actions/create-token
+        with:
+          app-id: ${{ vars.RELEASE_BOT_APP_ID }}
+          private-key: ${{ secrets.RELEASE_BOT_PRIVATE_KEY }}
+          permission-pull-requests: write
+
+      - uses: ./.github/actions/close-pr-with-comment
+        if: ${{ env.IS_MANUAL_RELEASE == 'true' }}
+        with:
+          token: ${{ steps.auth.outputs.token }}
+          pull-request-number: ${{ github.event.pull_request.number }}
+          comment: "⚠️ **Notice:** Release PRs cannot be created manually. Please let the automated release workflow handle this. Closing this PR."
+
+      - if: ${{ env.IS_MANUAL_RELEASE == 'true' }}
+        run: |
+          echo "::error::It is forbidden to create release PRs manually. Release process should be handled by the release bot."
+          exit 1
