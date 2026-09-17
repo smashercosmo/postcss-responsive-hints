@@ -1,19 +1,17 @@
 import {
   ActExecStatus,
   ActRunner,
-  ActWorkflowExecResult,
-} from "@pshevche/act-test-runner";
+  type ActWorkflowExecResult,
+} from "act-test-runner";
 import child_process, { type ExecFileSyncOptions } from "node:child_process";
 import fs from "node:fs";
-import os from "node:os";
-import path from "node:path";
 import url from "node:url";
 import { describe, expect, it, afterAll, beforeAll } from "vitest";
 
-import { FEATURE_BRANCH_NAME, getActArgs } from "./actrc.ts";
-import { addPendingChangeFiles } from "./scripts/add-pending-change-files.ts";
-import { createMockGitRepo } from "./scripts/create-mock-git-repo.ts";
-import { server } from "./scripts/create-mock-github-server";
+import { FEATURE_BRANCH_NAME, getAdditionalArgs } from "../actrc.ts";
+import { addPendingChangeFiles } from "../scripts/add-pending-change-files.ts";
+import { createMockGitRepo } from "../scripts/create-mock-git-repo.ts";
+import { server } from "../scripts/create-mock-github-server";
 
 const tmpDirs: Array<string> = [];
 
@@ -22,25 +20,21 @@ const workflowPath = url.fileURLToPath(
 );
 
 function createActRunner({ branch }: { branch: string }): ActRunner {
-  const repoTmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "act-repo-"));
-  const originTmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "act-origin-"));
+  const { localRepoTmpDir, remoteRepoTmpDir } = createMockGitRepo();
+  tmpDirs.push(localRepoTmpDir);
+  tmpDirs.push(remoteRepoTmpDir);
 
-  tmpDirs.push(repoTmpDir);
-  tmpDirs.push(originTmpDir);
-
-  createMockGitRepo({ originTmpDir, repoTmpDir });
-
-  const args = getActArgs({
-    originTmpDir,
-    repoTmpDir,
+  const args = getAdditionalArgs({
+    localRepoTmpDir,
+    remoteRepoTmpDir,
   });
 
-  const options: ExecFileSyncOptions = { cwd: repoTmpDir, encoding: "utf8" };
+  const options: ExecFileSyncOptions = { cwd: localRepoTmpDir, encoding: "utf8" };
 
   addPendingChangeFiles({
     branch,
     bump: "major",
-    options,
+    repo: localRepoTmpDir,
     pkg: "postcss-responsive-hints",
     summary: "a lot of breaking changes",
   });
@@ -48,7 +42,7 @@ function createActRunner({ branch }: { branch: string }): ActRunner {
   addPendingChangeFiles({
     branch,
     bump: "minor",
-    options,
+    repo: localRepoTmpDir,
     pkg: "@root/shared",
     summary: "better code",
   });
@@ -103,7 +97,9 @@ function createActRunner({ branch }: { branch: string }): ActRunner {
         state: "closed",
       },
     })
-    .withWorkflowFile(workflowPath)
+    .withWorkflow({
+      file: workflowPath
+    })
     .withAdditionalArgs(...args.flatMap(item => item))
     .forwardOutput();
 }

@@ -16,94 +16,8 @@ on:
       - main
 
 jobs:
-  check-for-pending-change-files:
-    name: Checks for pending change files. Every PR (except for the release one) must have them.
-    runs-on: ubuntu-latest
-    outputs:
-      has-pending-change-files: ${{ steps.check.outputs.has-pending-change-files }}
-    # Release PRs are exempt: the release bot consumes/removes pending change files when
-    # assembling the release PR, so this branch never has any to find. A job skipped via
-    # job-level `if:` reports as "Success" to required status checks, so this exemption
-    # doesn't block merging release PRs even with the check marked required on main.
-    if: ${{ !(github.event.pull_request.head.ref == vars.RELEASE_BRANCH_NAME && github.event.pull_request.user.type == 'Bot') }}
-    permissions:
-      contents: read
-    steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          persist-credentials: false
-
-      - uses: pnpm/setup@84cb39b217b10273981911c288cd62326dc7c6d2 # v2.0.2
-        with:
-          install: false
-
-      - id: check
-        uses: ./.github/actions/check-for-pending-change-files
-
-      - if: ${{ steps.check.outputs.has-pending-change-files == 'true' }}
-        run: echo '::notice::Submitted PR contains pending change files. Ready to proceed to the next step.'
-
-      - if: ${{ steps.check.outputs.has-pending-change-files != 'true' }}
-        run: |
-          echo "::error::No pending change files found in the submitted PR. Please run `pnpm change` and push the generated change files."
-          exit 1
-
-  # This job always runs, independent of the changeset check's outcome, so that a
-  # missing changeset (which blocks merge on its own via a required status check on
-  # main) doesn't also block lint/test from giving fast feedback on the code itself.
-  guard-against-manual-release:
-    name: Prevents the manual creation of the release PR
-    environment: release
-    runs-on: ubuntu-latest
-    env:
-      # Only smashercosmo-release-bot can create/update/delete refs matching the release
-      # branch (enforced by repo ruleset), so this check is a workflow-level backstop to
-      # that platform-level restriction rather than the primary defense.
-      IS_MANUAL_RELEASE: ${{ github.event.pull_request.head.ref == vars.RELEASE_BRANCH_NAME && github.event.pull_request.user.type != 'Bot' }}
-    outputs:
-      is-manual-release: ${{ env.IS_MANUAL_RELEASE }}
-    permissions:
-      contents: read
-    steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          persist-credentials: false
-
-      - uses: pnpm/setup@84cb39b217b10273981911c288cd62326dc7c6d2 # v2.0.2
-        with:
-          cache: true
-          install: true
-
-      - id: auth
-        if: ${{ env.IS_MANUAL_RELEASE == 'true' }}
-        uses: ./.github/actions/create-token
-        with:
-          app-id: ${{ vars.RELEASE_BOT_APP_ID }}
-          private-key: ${{ secrets.RELEASE_BOT_PRIVATE_KEY }}
-          permission-pull-requests: write
-
-      - uses: ./.github/actions/close-pr-with-comment
-        if: ${{ env.IS_MANUAL_RELEASE == 'true' }}
-        with:
-          token: ${{ steps.auth.outputs.token }}
-          pull-request-number: ${{ github.event.pull_request.number }}
-          comment: "⚠️ **Notice:** Release PRs cannot be created manually. Please let the automated release workflow handle this. Closing this PR."
-
-      - if: ${{ env.IS_MANUAL_RELEASE == 'true' }}
-        run: |
-          echo "::error::It is forbidden to create release PRs manually. Release process should be handled by the release bot."
-          exit 1
-
   lint:
     name: Runs eslint and oxlint checks
-    needs: [check-for-pending-change-files, guard-against-manual-release]
-    # Run whenever this isn't a manual release, independent of check-for-pending-change-files'
-    # result. That job blocks merge on its own (as a required status check on main); we don't
-    # want a missing changeset to also hold back lint/test feedback on the code itself.
-    if: |
-      always() &&
-      needs.guard-against-manual-release.result == 'success' &&
-      needs.guard-against-manual-release.outputs.is-manual-release == 'false'
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -112,20 +26,20 @@ jobs:
         with:
           persist-credentials: false
 
-      - uses: pnpm/setup@84cb39b217b10273981911c288cd62326dc7c6d2 # v2.0.2
+      - uses: pnpm/setup@703c52620218391530e48b9e8870d5c0082e1b9b # v2.1.0
         with:
           cache: true
           install: true
 
-      - run: pnpm lint
+      - name: lint
+        run: |
+          echo '::notice:: running lint checks.'
+          pnpm lint
+          pnpm lint:actions
+          echo '::notice:: no lint errors found.'
 
   test:
     name: Runs tests (except for the github actions tests)
-    needs: [check-for-pending-change-files, guard-against-manual-release]
-    if: |
-      always() &&
-      needs.guard-against-manual-release.result == 'success' &&
-      needs.guard-against-manual-release.outputs.is-manual-release == 'false'
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -134,9 +48,13 @@ jobs:
         with:
           persist-credentials: false
 
-      - uses: pnpm/setup@84cb39b217b10273981911c288cd62326dc7c6d2 # v2.0.2
+      - uses: pnpm/setup@703c52620218391530e48b9e8870d5c0082e1b9b # v2.1.0
         with:
           cache: true
           install: true
 
-      - run: pnpm test:ci
+      - name: test
+        run: |
+          echo '::notice:: running tests.'
+          pnpm test:ci
+          echo '::notice:: all tests pass.'

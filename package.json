@@ -1,6 +1,7 @@
 {
   "name": "root",
   "private": true,
+  "version": "0.0.0",
   "description": "PostCSS plugin that makes it easier to write responsive styles",
   "keywords": [
     "postcss",
@@ -23,23 +24,20 @@
     "format": "oxfmt",
     "lint": "oxlint",
     "lint:actions": "eslint .github/**/*.yml",
-    "deps:update": "pnpm up -r --latest --interactive --include-github-actions",
-    "deps:remove": "deps-remove",
-    "deps:add": "deps-add",
-    "actions:update": "actions-up"
+    "update:deps": "pnpm up -r --latest --interactive",
+    "update:actions": "actions-up"
   },
   "devDependencies": {
     "@commitlint/cli": "catalog:dev",
     "@commitlint/cz-commitlint": "catalog:dev",
     "@pnpm/types": "catalog:types",
-    "@root/scripts": "workspace:*",
     "@root/shared": "workspace:*",
     "@root/tsconfig": "workspace:*",
     "actions-up": "catalog:dev",
     "clean-publish": "catalog:dev",
     "commitizen": "catalog:dev",
     "cz-conventional-changelog": "catalog:dev",
-    "eslint": "catalog:",
+    "eslint": "catalog:lint",
     "eslint-plugin-github-action": "catalog:lint",
     "eslint-plugin-no-only-tests": "catalog:lint",
     "eslint-plugin-perfectionist": "catalog:lint",
@@ -55,12 +53,7 @@
   "devEngines": {
     "packageManager": {
       "name": "pnpm",
-      "version": "v12.0.0",
-      "onFail": "download"
-    },
-    "runtime": {
-      "name": "node",
-      "version": "^24.0.0 || >=26.0.0",
+      "version": "v12.3.4",
       "onFail": "download"
     }
   }

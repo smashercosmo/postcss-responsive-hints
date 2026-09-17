@@ -10,10 +10,11 @@
     "@mswjs/http-middleware": "catalog:dev",
     "@octokit/types": "catalog:types",
     "@octokit/webhooks-types": "catalog:types",
-    "@pshevche/act-test-runner": "catalog:test",
+    "act-test-runner": "file:act-test-runner-2.0.0.tgz",
     "@root/tsconfig": "workspace:*",
     "@types/http-proxy": "catalog:types",
     "@verdaccio/types": "catalog:types",
+    "better-typescript": "catalog:types",
     "http-proxy": "catalog:dev",
     "msw": "catalog:dev",
     "type-fest": "catalog:types"
