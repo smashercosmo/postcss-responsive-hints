@@ -36,10 +36,12 @@ jobs:
 
       - name: success
         if: ${{ steps.check.outputs.has-pending-change-files == 'true' }}
-        run: echo '::notice::Submitted PR contains pending change files. Ready to proceed to the next step.'
+        shell: bash
+        run: |
+          echo '::notice:: Submitted PR contains pending change files. Ready to proceed to the next step.'
 
       - name: failure
         if: ${{ steps.check.outputs.has-pending-change-files != 'true' }}
         run: |
-          echo '::error::No pending change files found in the submitted PR. Please run `pnpm change` and push the generated change files.'
+          echo '::error:: No pending change files found in the submitted PR. Please run `pnpm change` and push the generated change files.'
           exit 1

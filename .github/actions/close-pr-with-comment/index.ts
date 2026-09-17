@@ -1,4 +1,4 @@
-import { getInput, info, setFailed } from "@actions/core";
+import { getInput, debug,  setFailed } from "@actions/core";
 import { context, getOctokit } from "@actions/github";
 
 try {
@@ -9,12 +9,14 @@ try {
     10,
   );
 
-  await octokit.rest.issues.createComment({
+  const createCommentResult  = await octokit.rest.issues.createComment({
     body: comment,
     issue_number: number,
     owner: context.repo.owner,
     repo: context.repo.repo,
   });
+
+  debug(`Comment added to the PR #${number}: ${createCommentResult.data.body}`);
 
   const result = await octokit.rest.pulls.update({
     owner: context.repo.owner,
@@ -22,7 +24,9 @@ try {
     repo: context.repo.repo,
     state: "closed",
   });
-  info(`PR #${result.data?.number} is ${result.data.state}`);
+
+  debug(`PR #${result.data?.number} has been ${result.data.state}.`);
+  setFailed("It is forbidden to create release PRs manually. Release process should be handled by the release bot.");
 } catch (error) {
   if (error instanceof Error) {
     setFailed(error.message);

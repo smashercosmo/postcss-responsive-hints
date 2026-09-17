@@ -1,140 +1,88 @@
-import {
-  ActExecStatus,
-  ActRunner,
-  type ActWorkflowExecResult,
-} from "act-test-runner";
-import child_process, { type ExecSyncOptions } from "node:child_process";
+import { ActExecStatus, ActRunner } from "act-test-runner";
 import fs from "node:fs";
-import os from "node:os";
-import path from "node:path";
 import url from "node:url";
 import { describe, expect, it, afterAll, beforeAll } from "vitest";
 
-import { FEATURE_BRANCH_NAME, getAdditionalArgs } from "./actrc.ts";
-import { addPendingChangeFiles } from "./scripts/add-pending-change-files.ts";
+import {
+  FEATURE_BRANCH_NAME,
+  getAdditionalArgs,
+  getCacheServerArgs,
+  getEnvs,
+  getSecrets,
+  getVars,
+} from "./actrc.ts";
+import { addEmptyCommit } from "./scripts/add-empty-commit.ts";
 import { createMockGitRepo } from "./scripts/create-mock-git-repo.ts";
 import { server } from "./scripts/create-mock-github-server";
+import { createMockPullRequest } from "./scripts/create-mock-pull-request.ts";
+import { OutputListener } from "./scripts/output-listener.ts";
 
-const tmpDirs: Array<string> = [];
+let tmpDirs: Array<string> = [];
+let outputListeners: OutputListener[] = [];
+let abourtControllers: AbortController[] = [];
 
 const workflowPath = url.fileURLToPath(
   import.meta.resolve("../workflows/pr.yml"),
 );
-
-function createActRunner({
-  branch,
-  shouldGenerateChangeFiles,
-}: {
-  branch: string;
-  shouldGenerateChangeFiles: boolean;
-}): ActRunner {
-  const repoTmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "act-repo-"));
-  const originTmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "act-origin-"));
-
-  tmpDirs.push(repoTmpDir);
-  tmpDirs.push(originTmpDir);
-
-  createMockGitRepo({ originTmpDir, repoTmpDir });
-
-  const args = getAdditionalArgs({
-    originTmpDir,
-    repoTmpDir,
-  });
-
-  const options: ExecSyncOptions = {
-    cwd: repoTmpDir,
-    encoding: "utf8",
-  };
-
-  if (shouldGenerateChangeFiles) {
-    addPendingChangeFiles({
-      branch,
-      bump: "major",
-      options,
-      pkg: "postcss-responsive-hints",
-      summary: "a lot of breaking changes",
-    });
-
-    addPendingChangeFiles({
-      branch,
-      bump: "minor",
-      options,
-      pkg: "@root/shared",
-      summary: "better code",
-    });
-  }
-
-  return new ActRunner()
-    .withEvent("pull_request", {
-      action: "opened",
-      number: 10,
-      pull_request: {
-        base: { ref: "main" },
-        head: { ref: `${branch}` },
-        number: 10,
-        state: "open",
-      },
-    })
-    .withWorkflow({ file: workflowPath })
-    .withAdditionalArgs(...args.flatMap(item => item))
-    .forwardOutput();
-}
-
-let actRunnerInProgress: Promise<ActWorkflowExecResult>;
 
 beforeAll(() => {
   server.listen({ port: 9999 });
 });
 
 afterAll(() => {
-  actRunnerInProgress?.finally(() => server.close());
   tmpDirs.forEach(tmpDir => {
     fs.rmSync(tmpDir, { force: true, recursive: true });
   });
+  outputListeners.forEach(listener => {
+    listener.clear();
+  });
+  abourtControllers.forEach(controller => {
+    controller.abort();
+  });
+  server.close();
+  tmpDirs.length = 0;
+  outputListeners.length = 0;
+  abourtControllers.length = 0;
 });
 
 describe("PR workflows", () => {
-  describe("Feature PR workflow", () => {
-    it("should fail when feature PR does not have generated changesets", async () => {
-      actRunnerInProgress = createActRunner({
-        branch: FEATURE_BRANCH_NAME,
-        shouldGenerateChangeFiles: false,
-      }).run();
+  it("should run lint checks and tests", async () => {
+    const { localRepoTmpDir, remoteRepoTmpDir } = createMockGitRepo();
+    tmpDirs.push(localRepoTmpDir);
+    tmpDirs.push(remoteRepoTmpDir);
 
-      const result = await actRunnerInProgress;
-      expect(result.status).toBe(ActExecStatus.FAILED);
-    }, 140_000);
+    addEmptyCommit({ repo: localRepoTmpDir, branch: FEATURE_BRANCH_NAME });
 
-    it("should succeed when feature PR has generated changesets", async () => {
-      actRunnerInProgress = createActRunner({
-        branch: FEATURE_BRANCH_NAME,
-        shouldGenerateChangeFiles: true,
-      }).run();
+    const pullRequestEvent = createMockPullRequest({
+      repo: localRepoTmpDir,
+      branch: FEATURE_BRANCH_NAME,
+      number: 30,
+    });
 
-      const result = await actRunnerInProgress;
-      expect(result.status).toBe(ActExecStatus.SUCCESS);
-    }, 140_000);
-  });
+    const outputListener = new OutputListener({
+      streamOutput: true,
+    });
+    outputListeners.push(outputListener);
 
-  /*  describe("Release PR workflow", () => {
-    it("should fail when release PR has generated changesets", async () => {
-      actRunnerInProgress = createActRunner({
-        branch: RELEASE_BRANCH_NAME,
-        shouldGenerateChangeFiles: true,
-      }).run();
+    const controller = new AbortController();
+    abourtControllers.push(controller);
 
-      const result = await actRunnerInProgress;
-      expect(result.status).toBe(ActExecStatus.FAILED);
-    }, 140_000);
+    const { status } = await new ActRunner()
+      .withEvent("pull_request", pullRequestEvent)
+      .withCacheServer(getCacheServerArgs())
+      .withWorkflow({ file: workflowPath })
+      .withEnvs(getEnvs({ remoteRepoTmpDir }))
+      .withSecrets(getSecrets())
+      .withVars(getVars())
+      .withAdditionalArgs(
+        ...getAdditionalArgs({
+          remoteRepoTmpDir,
+          localRepoTmpDir,
+        }),
+      )
+      .forwardOutput(outputListener)
+      .run({ signal: controller.signal });
 
-    it("should succeed when release PR doesn't have generated changesets", async () => {
-      actRunnerInProgress = createActRunner({
-        branch: RELEASE_BRANCH_NAME,
-        shouldGenerateChangeFiles: false,
-      }).run();
-
-      const result = await actRunnerInProgress;
-      expect(result.status).toBe(ActExecStatus.SUCCESS);
-    }, 140_000);
-  });*/
+    expect(status).toBe(ActExecStatus.SUCCESS);
+  }, 140_000);
 });

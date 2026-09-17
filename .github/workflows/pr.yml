@@ -18,14 +18,6 @@ on:
 jobs:
   lint:
     name: Runs eslint and oxlint checks
-    needs: [check-for-pending-change-files, guard-against-manual-release]
-    # Run whenever this isn't a manual release, independent of check-for-pending-change-files'
-    # result. That job blocks merge on its own (as a required status check on main); we don't
-    # want a missing changeset to also hold back lint/test feedback on the code itself.
-    if: |
-      always() &&
-      needs.guard-against-manual-release.result == 'success' &&
-      needs.guard-against-manual-release.outputs.is-manual-release == 'false'
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -39,15 +31,15 @@ jobs:
           cache: true
           install: true
 
-      - run: pnpm lint
+      - name: lint
+        run: |
+          echo '::notice:: running lint checks.'
+          pnpm lint
+          pnpm lint:actions
+          echo '::notice:: no lint errors found.'
 
   test:
     name: Runs tests (except for the github actions tests)
-    needs: [check-for-pending-change-files, guard-against-manual-release]
-    if: |
-      always() &&
-      needs.guard-against-manual-release.result == 'success' &&
-      needs.guard-against-manual-release.outputs.is-manual-release == 'false'
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -61,4 +53,8 @@ jobs:
           cache: true
           install: true
 
-      - run: pnpm test:ci
+      - name: test
+        run: |
+          echo '::notice:: running tests.'
+          pnpm test:ci
+          echo '::notice:: all tests pass.'

@@ -1,19 +1,17 @@
 import { ActExecStatus, ActRunner } from "act-test-runner";
-import child_process from "node:child_process";
 import fs from "node:fs";
 import url from "node:url";
 import { describe, expect, it, beforeAll, afterAll } from "vitest";
 
 import {
-  FEATURE_BRANCH_NAME,
   getAdditionalArgs,
   getCacheServerArgs,
   getEnvs,
-  getSecrets, getVars,
+  getSecrets,
+  getVars,
   RELEASE_BRANCH_NAME,
-} from './actrc'
+} from "./actrc";
 import { addEmptyCommit } from "./scripts/add-empty-commit.ts";
-import { addPendingChangeFiles } from "./scripts/add-pending-change-files";
 import { createMockGitRepo } from "./scripts/create-mock-git-repo";
 import { server } from "./scripts/create-mock-github-server";
 import { createMockPullRequest } from "./scripts/create-mock-pull-request.ts";
@@ -58,10 +56,20 @@ describe("Guard Against Manual Release", () => {
     const pullRequestEvent = createMockPullRequest({
       repo: localRepoTmpDir,
       branch: RELEASE_BRANCH_NAME,
+      number: 20,
     });
 
     const outputListener = new OutputListener({
-      streamOutput: true,
+      streamOutput: false,
+      filter(entry) {
+        return (
+          entry.step?.name === "close-pr-with-comment" &&
+          (entry.message.includes("::notice::") ||
+            entry.message.includes("::debug::") ||
+            entry.message.includes("::error::")
+          )
+        );
+      },
     });
     outputListeners.push(outputListener);
 
@@ -81,13 +89,20 @@ describe("Guard Against Manual Release", () => {
           localRepoTmpDir,
         }),
       )
-      .forwardOutput()
+      .forwardOutput(outputListener)
       .run({ signal: controller.signal });
 
-    /*expect(outputListener.entries.length).toBe(1);
-    expect(outputListener.entries[0].message).toBe(
-      "Submitted PR contains pending change files. Ready to proceed to the next step.",
-    );*/
-    expect(status).toBe(ActExecStatus.SUCCESS);
+    const entries = outputListener.getEntries();
+    expect(entries.length).toBe(3);
+    expect(entries[1].message).toBe(
+      "::debug::Comment added to the PR #20: **Notice:** Release PRs cannot be created manually. Please let the automated release workflow handle this. Closing this PR.",
+    );
+    expect(entries[2].message).toBe(
+      "::debug::PR #20 has been closed.",
+    );
+    expect(entries[3].message).toBe(
+      "::error::It is forbidden to create release PRs manually. Release process should be handled by the release bot.",
+    );
+    expect(status).toBe(ActExecStatus.FAILED);
   }, 140_000);
 });

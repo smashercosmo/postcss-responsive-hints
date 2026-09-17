@@ -24,16 +24,13 @@
     "format": "oxfmt",
     "lint": "oxlint",
     "lint:actions": "eslint .github/**/*.yml",
-    "deps:update": "pnpm up -r --latest --interactive",
-    "deps:remove": "deps-remove",
-    "deps:add": "deps-add",
-    "actions:update": "actions-up"
+    "update:deps": "pnpm up -r --latest --interactive",
+    "update:actions": "actions-up"
   },
   "devDependencies": {
     "@commitlint/cli": "catalog:dev",
     "@commitlint/cz-commitlint": "catalog:dev",
     "@pnpm/types": "catalog:types",
-    "@root/scripts": "workspace:*",
     "@root/shared": "workspace:*",
     "@root/tsconfig": "workspace:*",
     "actions-up": "catalog:dev",

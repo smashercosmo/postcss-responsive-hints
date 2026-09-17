@@ -3,11 +3,12 @@ import child_process from "node:child_process";
 export function createMockPullRequest({
   repo,
   branch,
+  number,
 }: {
   repo: string;
   branch: string;
+  number: number;
 }) {
-  const PR_NUMBER = 10;
   const exec = (args: string[]) =>
     child_process
       .execFileSync("git", args, { cwd: repo, encoding: "utf8" })
@@ -33,14 +34,14 @@ export function createMockPullRequest({
 
   // 3. Register the standard GitHub pull request merge ref (`refs/pull/<id>/merge`)
   // pointing directly to the generated synthetic merge commit.
-  exec(["update-ref", `refs/pull/${PR_NUMBER}/merge`, commitSha]);
+  exec(["update-ref", `refs/pull/${number}/merge`, commitSha]);
 
   // 4. Force-push the PR merge ref to the local bare origin repository so `actions/checkout`
   // can resolve and fetch the ref when running inside the container.
   exec([
     "push",
     "origin",
-    `refs/pull/${PR_NUMBER}/merge:refs/pull/${PR_NUMBER}/merge`,
+    `refs/pull/${number}/merge:refs/pull/${number}/merge`,
     "--force",
   ]);
 
@@ -51,11 +52,11 @@ export function createMockPullRequest({
   // Return an event payload matching GitHub's `pull_request` webhook structure
   return {
     action: "opened",
-    number: PR_NUMBER,
+    number,
     pull_request: {
       base: { ref: "main" },
       head: { ref: branch },
-      number: PR_NUMBER,
+      number,
       state: "open",
     },
   } as const;

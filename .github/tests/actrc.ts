@@ -22,9 +22,10 @@ export function getAdditionalArgs({
 }) {
   return [
     ["-P", `ubuntu-latest=${CUSTOM_ACT_IMAGE}:latest`],
+    ['--pull'],
+    ["--verbose"],
     ["--action-offline-mode"],
     ["--no-skip-checkout"],
-    ['--verbose'],
     ["--directory", localRepoTmpDir],
     ["--container-options", `-v ${remoteRepoTmpDir}:${remoteRepoTmpDir}`],
     ["--container-architecture", `linux/amd64`],

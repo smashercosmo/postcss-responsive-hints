@@ -1,4 +1,0 @@
-{
-  "extends": "@root/tsconfig/node",
-  "include": ["./src"]
-}

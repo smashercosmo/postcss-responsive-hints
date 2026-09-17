@@ -242,9 +242,6 @@ importers:
       '@pnpm/types':
         specifier: catalog:types
         version: 1102.1.0
-      '@root/scripts':
-        specifier: workspace:*
-        version: link:packages/scripts
       '@root/shared':
         specifier: workspace:*
         version: link:packages/shared
@@ -384,12 +381,6 @@ importers:
       tsdown:
         specifier: catalog:dev
         version: 0.23.0(typescript@7.0.2)
-
-  packages/scripts:
-    devDependencies:
-      '@root/tsconfig':
-        specifier: workspace:*
-        version: link:../tsconfig
 
   packages/shared:
     devDependencies:

@@ -3,7 +3,7 @@ import {
   setOutput,
   saveState,
   error,
-  info,
+  debug,
   setFailed,
 } from "@actions/core";
 import { getOctokit, context } from "@actions/github";
@@ -67,7 +67,7 @@ try {
     permissions,
   });
 
-  info("Token created successfully");
+  debug("Auth token has been successfully created");
   saveState("token", data.token);
   setOutput("app-slug", installation.app_slug);
   setOutput("token", data.token);

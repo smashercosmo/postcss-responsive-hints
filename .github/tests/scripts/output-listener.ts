@@ -1,6 +1,6 @@
 import type { ActOutput, ActOutputListener } from "act-test-runner";
 
-const STRIP_MESSAGE_TYPE_REGEX = /::\w+::(.*)/s;
+const TIDY_UP_MESSAGE_REGEX = /\s*((::\w+::\s*)(.*?))[\r|\n]{1,}/s;
 
 export class OutputListener implements ActOutputListener {
   streamOutput: boolean | undefined = false;
@@ -27,10 +27,14 @@ export class OutputListener implements ActOutputListener {
     if (typeof this.filter === "function" && !this.filter(entry)) return;
     const { message, job, step } = entry;
     this.entries.push({
-      message: (message.match(STRIP_MESSAGE_TYPE_REGEX)?.[1] ?? message).trim(),
+      message: (message.match(TIDY_UP_MESSAGE_REGEX)?.[1] ?? message).trim(),
       job: job?.id,
       step: step?.name ?? step?.id,
     });
+  }
+
+  getEntries() {
+    return this.entries;
   }
 
   clear() {

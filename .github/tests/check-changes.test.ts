@@ -1,5 +1,4 @@
 import { ActExecStatus, ActRunner } from "act-test-runner";
-import child_process from "node:child_process";
 import fs from "node:fs";
 import url from "node:url";
 import { describe, expect, it, beforeAll, afterAll } from "vitest";
@@ -57,6 +56,7 @@ describe("Check Changes", () => {
     const pullRequestEvent = createMockPullRequest({
       repo: localRepoTmpDir,
       branch: FEATURE_BRANCH_NAME,
+      number: 10,
     });
 
     const outputListener = new OutputListener({
@@ -87,9 +87,10 @@ describe("Check Changes", () => {
       .forwardOutput(outputListener)
       .run({ signal: controller.signal });
 
-    expect(outputListener.entries.length).toBe(1);
-    expect(outputListener.entries[0].message).toBe(
-      "No pending change files found in the submitted PR. Please run `pnpm change` and push the generated change files.",
+    const entries = outputListener.getEntries();
+    expect(entries.length).toBe(1);
+    expect(entries[0].message).toBe(
+      "::error:: No pending change files found in the submitted PR. Please run `pnpm change` and push the generated change files.",
     );
     expect(status).toBe(ActExecStatus.FAILED);
   }, 140_000);
@@ -117,6 +118,7 @@ describe("Check Changes", () => {
     const pullRequestEvent = createMockPullRequest({
       repo: localRepoTmpDir,
       branch: FEATURE_BRANCH_NAME,
+      number: 10,
     });
 
     const outputListener = new OutputListener({
@@ -147,9 +149,10 @@ describe("Check Changes", () => {
       .forwardOutput(outputListener)
       .run({ signal: controller.signal });
 
-    expect(outputListener.entries.length).toBe(1);
-    expect(outputListener.entries[0].message).toBe(
-      "Submitted PR contains pending change files. Ready to proceed to the next step.",
+    const entries = outputListener.getEntries();
+    expect(entries.length).toBe(1);
+    expect(entries[0].message).toBe(
+      "::notice:: Submitted PR contains pending change files. Ready to proceed to the next step.",
     );
     expect(status).toBe(ActExecStatus.SUCCESS);
   }, 140_000);

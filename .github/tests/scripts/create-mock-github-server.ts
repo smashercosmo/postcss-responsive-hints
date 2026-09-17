@@ -44,12 +44,12 @@ type Response<TEndpoint extends Endpoint> =
 async function getRequestBody(request: StrictRequest<DefaultBodyType>) {
   if (request.method !== "GET" && request.method !== "HEAD") {
     try {
-      return [await request.clone().json()];
+      return await request.clone().json();
     } catch {
-      return [];
+      return {};
     }
   } else {
-    return [];
+    return {};
   }
 }
 
@@ -75,14 +75,15 @@ function octokitEndpointMethodToMswHandler<TEndpoint extends Endpoint>({
   const { method: METHOD, url } = handler.endpoint.DEFAULTS;
   const patternPath = url.replaceAll(/\{([^}]+)}/g, ":$1");
 
-  return http[toLowerCase(METHOD)](`*${patternPath}`, ({ params, request }) => {
+  return http[toLowerCase(METHOD)](`*${patternPath}`, async ({ params, request }) => {
     console.info("MOCK", request.method, new URL(request.url).pathname);
+    const body = await getRequestBody(request);
     return HttpResponse.json(
       typeof response === "function"
         ? response({
             ...params,
             ...Object.fromEntries(new URL(request.url).searchParams.entries()),
-            ...getRequestBody(request),
+            ...(typeof body === "object" ? body : {}),
           })
         : response,
       { status },
@@ -122,8 +123,10 @@ const handlers = [
   }),
   octokitEndpointMethodToMswHandler({
     handler: api.rest.issues.createComment,
-    response: {
-      body: "Whatever you say",
+    response(data) {
+      return {
+        body: data?.body
+      }
     },
     status: 201,
   }),
@@ -151,7 +154,6 @@ const handlers = [
   octokitEndpointMethodToMswHandler({
     handler: api.rest.pulls.update,
     response(data) {
-      console.log("data:", data);
       return {
         number: data?.pull_number,
         state: data?.state
