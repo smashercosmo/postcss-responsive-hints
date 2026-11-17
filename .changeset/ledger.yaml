@@ -1,0 +1,5 @@
+postcss-responsive-hints@2.1.0:
+  dir: packages/postcss-responsive-hints
+  intents:
+    - giant-elephants-roll
+    - heavy-tables-cough
