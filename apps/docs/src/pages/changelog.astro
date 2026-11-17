@@ -1,0 +1,59 @@
+---
+import Layout from "#components/layout.astro";
+// oxlint-disable-next-line import/no-relative-parent-imports -- the changelog lives in the package
+import { compiledContent } from "../../../../packages/postcss-responsive-hints/CHANGELOG.md";
+
+/** The title of the file is the package name, the page has its own. */
+const html = await compiledContent();
+const titleEnd = html.indexOf("</h1>");
+const content =
+  titleEnd === -1 ? html : html.slice(titleEnd + "</h1>".length);
+---
+
+<Layout
+  title="Changelog · postcss-responsive-hints"
+  description="Every release of postcss-responsive-hints."
+>
+  <main class="changelog">
+    <h1>Changelog</h1>
+    <div class="changelog__entries" set:html={content} />
+  </main>
+</Layout>
+
+<style>
+  .changelog {
+    max-width: var(--measure);
+    margin: 0 auto;
+    padding: 3rem 1rem 0;
+  }
+
+  h1 {
+    margin: 0 0 2rem;
+    font-size: 2.1rem /* | 2.5rem | x */;
+  }
+
+  /* Every version */
+  .changelog__entries :global(h2) {
+    margin: 2.5rem 0 0.5rem;
+    padding-top: 1.25rem;
+    border-top: 1px solid var(--rule);
+    font-size: 1.25rem;
+  }
+
+  .changelog__entries :global(h2::before) {
+    content: "v";
+    color: var(--accent);
+  }
+
+  .changelog__entries :global(h3) {
+    margin: 1rem 0 0.5rem;
+    color: var(--ink-muted);
+    font-size: 0.75rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .changelog__entries :global(li + li) {
+    margin-top: 0.35rem;
+  }
+</style>

@@ -1,0 +1,8 @@
+{
+  "extends": "@smashercosmo/configs/ts/dom",
+  "include": [".astro/types.d.ts", "src/**/*.ts", "astro.config.ts"],
+  "compilerOptions": {
+    "tsBuildInfoFile": "node_modules/.tmp/tsconfig.tsbuildinfo",
+    "types": ["node", "astro/client"]
+  }
+}

@@ -1,0 +1,79 @@
+---
+// oxlint-disable-next-line import/no-unassigned-import -- colors of the code
+import "microlighter/themes/flexoki.css";
+// oxlint-disable-next-line import/no-unassigned-import -- global styles
+import "#root/styles/global.css";
+
+import Header from "#components/header.astro";
+import { THEME_KEY, withBase } from "#root/site.js";
+
+interface Props {
+  title: string;
+  description: string;
+}
+
+const { title, description } = Astro.props;
+const canonical = new URL(Astro.url.pathname, Astro.site);
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <meta name="color-scheme" content="light dark" />
+    <link rel="canonical" href={canonical} />
+    <link rel="icon" href={withBase("icon.svg")} type="image/svg+xml" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="postcss-responsive-hints" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    {
+      /**
+       * Applies the picked theme before the first paint, so the page doesn't
+       * flash in the other theme. "auto" follows the system through CSS.
+       */
+    }
+    <script is:inline data-key={THEME_KEY}>
+      try {
+        const key = document.currentScript?.dataset.key ?? "";
+        const theme = localStorage.getItem(key);
+        if (theme === "light" || theme === "dark") {
+          document.documentElement.dataset.theme = theme;
+        }
+      } catch {
+        // Storage is unavailable: the theme follows the system
+      }
+    </script>
+  </head>
+  <body data-syntax-theme="flexoki">
+    <Header />
+    <slot />
+    <footer class="footer">
+      <span>MIT © Vladislav Shkodin</span>
+      <span aria-hidden="true">|</span>
+      <span>Built with Astro</span>
+    </footer>
+    <script>
+      // oxlint-disable-next-line import/no-unassigned-import -- entry point
+      import "#root/scripts/main.js";
+    </script>
+  </body>
+</html>
+
+<style>
+  .footer {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.75rem;
+    margin-top: 4rem;
+    padding: 2rem 1rem;
+    border-top: 1px solid var(--rule);
+    color: var(--ink-muted);
+    font: 0.8rem var(--mono);
+  }
+</style>

@@ -1,0 +1,302 @@
+---
+import Layout from "#components/layout.astro";
+import Playground from "#components/playground.astro";
+import Ruler from "#components/ruler.astro";
+import Toc from "#components/toc.astro";
+// oxlint-disable-next-line import/no-relative-parent-imports -- the docs are the README of the package
+import { compiledContent, getHeadings } from "../../../../packages/postcss-responsive-hints/README.md";
+import { REPO_URL, sectionTimeline } from "#root/site.js";
+
+/**
+ * The README of the package is the documentation, so the site and npm always
+ * say the same. Its title is left out: the hero takes its place.
+ */
+const html = await compiledContent();
+const titleEnd = html.indexOf("</h1>");
+const readme =
+  titleEnd === -1 ? html : html.slice(titleEnd + "</h1>".length);
+
+/**
+ * Every part of the README that starts with an <h2> or <h3> becomes a section
+ * with a view timeline, which its link in the table of contents follows. The
+ * introduction, before the first heading, becomes the "Overview" section, so
+ * there's no part of the docs without a link.
+ */
+const HEADING_ID = /^<h[23] id="(?<id>[^"]+)"/v;
+
+/**
+ * Tables scroll horizontally in a wrapper, which is focusable, so they can be
+ * scrolled with the keyboard, and named after the heading of their section.
+ * The headers of the head row are column headers.
+ */
+function wrapTables(markup: string, headingId: string) {
+  return markup
+    .replaceAll(
+      "<table>",
+      `<div class="table-scroll" role="region" tabindex="0" aria-labelledby="${headingId}"><table>`,
+    )
+    .replaceAll("</table>", "</table></div>")
+    .replaceAll(/<thead>[\s\S]*?<\/thead>/gv, (head) =>
+      head.replaceAll(/<th(?=[\s>])/gv, '<th scope="col"'),
+    );
+}
+
+const parts = readme.split(/(?=<h[23][\s>])/v);
+const overview = wrapTables(
+  parts.filter((part) => !HEADING_ID.test(part)).join(""),
+  "overview",
+);
+const content = parts
+  .flatMap((part) => {
+    const id = HEADING_ID.exec(part)?.groups?.["id"];
+    return id === undefined
+      ? []
+      : [
+          `<section class="doc-section" style="view-timeline-name: ${sectionTimeline(id)}">${wrapTables(part, id)}</section>`,
+        ];
+  })
+  .join("");
+
+const headings = await getHeadings();
+const toc = [
+  { id: "overview", label: "Overview", depth: 2 },
+  { id: "playground", label: "Playground", depth: 2 },
+  ...headings
+    .filter(({ depth }) => depth === 2 || depth === 3)
+    .map(({ slug, text, depth }) => ({ id: slug, label: text, depth })),
+];
+
+/** The sections are in the article, their links in the aside: both see these. */
+const timelineScope = toc.map(({ id }) => sectionTimeline(id)).join(", ");
+---
+
+<Layout
+  title="postcss-responsive-hints: responsive values, written inline"
+  description="A PostCSS plugin that turns padding: 10px | 20px | x | 30px into a base value and min-width media queries."
+>
+  <main>
+    <section class="hero">
+      <div class="hero__inner">
+        <div class="hero__text">
+          <p class="hero__eyebrow">PostCSS plugin</p>
+          <h1>Responsive values, written inline.</h1>
+          <p class="hero__lead">
+            Put every value of a property in one declaration, one per
+            breakpoint, and get a base value plus <code>min-width</code> media
+            queries. Mobile-first, no repeated selectors.
+          </p>
+          <pre
+            class="hero__install"><code class="language-console">$ npm install --save-dev postcss postcss-responsive-hints</code></pre>
+          <div class="hero__actions">
+            <a class="button" href="#installation">Get started</a>
+            <a class="button button--ghost" href="#playground">Try it</a>
+            <a class="button button--ghost" href={REPO_URL}>GitHub</a>
+          </div>
+        </div>
+        <Ruler />
+      </div>
+    </section>
+
+    <div class="docs" style={`timeline-scope: ${timelineScope}`}>
+      <div class="docs__main">
+        <section
+          class="overview-section doc-section"
+          style={`view-timeline-name: ${sectionTimeline("overview")}`}
+        >
+          <h2 id="overview">Overview</h2>
+          <div class="prose" set:html={overview} />
+        </section>
+
+        <section
+          class="playground-section doc-section"
+          style={`view-timeline-name: ${sectionTimeline("playground")}`}
+        >
+          <h2 id="playground">Playground</h2>
+          <p>
+            The plugin itself, running in your browser. Edit the CSS or the
+            options, and the output updates as you type.
+          </p>
+          <Playground />
+        </section>
+
+        <article class="prose" set:html={content} />
+      </div>
+
+      <aside class="docs__toc">
+        <Toc items={toc} />
+      </aside>
+    </div>
+  </main>
+</Layout>
+
+<style>
+  /*
+   * The styles of this site are written with postcss-responsive-hints, in
+   * comments: base value | from 40rem | from 64rem.
+   */
+  .hero {
+    border-bottom: 1px solid var(--rule);
+    background-color: var(--paper);
+    background-image:
+      linear-gradient(var(--grid) 1px, transparent 1px),
+      linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+    background-size: 24px 24px;
+  }
+
+  .hero__inner {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) /* | x | minmax(0, 1fr) minmax(0, 1fr) */;
+    align-items: center;
+    gap: 2.5rem /* | x | 4rem */;
+    max-width: 72rem;
+    margin: 0 auto;
+    padding: 3rem 1rem /* | 4rem 1.5rem | 5.5rem 1.5rem */;
+  }
+
+  .hero__eyebrow {
+    margin: 0 0 0.75rem;
+    color: var(--accent);
+    font: 600 0.75rem var(--mono);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .hero h1 {
+    margin: 0 0 1.25rem;
+    font-size: 2.1rem /* | 2.75rem | 3.25rem */;
+  }
+
+  .hero__lead {
+    max-width: 34rem;
+    margin: 0;
+    color: var(--ink-muted);
+    font-size: 1.05rem /* | 1.15rem | x */;
+  }
+
+  .hero__install {
+    margin: 1.75rem 0 0;
+    background: var(--paper-raised);
+    font-size: 0.8rem /* | 0.85rem | x */;
+  }
+
+  .hero__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-top: 1.5rem;
+  }
+
+  .button {
+    padding: 0.55rem 1.1rem;
+    border: 1px solid var(--accent);
+    background: var(--accent);
+    color: var(--accent-ink);
+    font: 600 0.85rem var(--mono);
+    text-decoration: none;
+  }
+
+  .button:hover {
+    /* oklab, not oklch: Chromium mixes near-neutrals in oklch with a red hue */
+    background: color-mix(in oklab, var(--accent) 85%, var(--ink));
+  }
+
+  .button--ghost {
+    background: var(--paper-raised);
+    color: var(--accent);
+  }
+
+  .button--ghost:hover {
+    background: var(--accent-wash);
+  }
+
+  .docs {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) /* | x | minmax(0, var(--measure)) 13rem */;
+    justify-content: center;
+    gap: 4rem;
+    max-width: 72rem;
+    margin: 0 auto;
+    padding: 0 1rem /* | 0 1.5rem | x */;
+  }
+
+  .docs__toc {
+    display: none /* | x | block */;
+  }
+
+  .docs__toc :global(.toc) {
+    position: sticky;
+    top: 1.5rem;
+    max-height: calc(100dvh - 3rem);
+    padding-top: 3rem;
+    overflow-y: auto;
+  }
+
+  .docs__main {
+    min-width: 0;
+  }
+
+  .overview-section,
+  .playground-section {
+    padding-top: 3rem;
+  }
+
+  /*
+   * The sections that the table of contents follows (see toc.astro), while they
+   * cross a line a fifth of the way down the viewport. flow-root keeps the
+   * margins of their headings inside them, so there are no gaps between them.
+   */
+  .docs :global(.doc-section) {
+    display: flow-root;
+    view-timeline-inset: 20% 80%;
+  }
+
+  /*
+   * Room below the last section, so it can scroll up to the line too. Only
+   * needed where the table of contents is shown.
+   */
+  .prose :global(.doc-section:last-child) {
+    min-height: auto /* | x | 80dvh */;
+  }
+
+  .playground-section > p {
+    color: var(--ink-muted);
+  }
+
+  /* The README */
+  .prose :global(h2) {
+    margin: 3.5rem 0 1rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--rule);
+    font-size: 1.5rem /* | 1.75rem | x */;
+  }
+
+  .prose :global(h2::before) {
+    content: "// " / "";
+    color: var(--accent);
+  }
+
+  .prose :global(h3) {
+    margin: 2.25rem 0 0.75rem;
+    font-size: 1.1rem /* | 1.2rem | x */;
+  }
+
+  /* The README links to this site: here, that would be a link to itself */
+  .prose
+    :global(p:has(> strong > a[href^="https://smashercosmo.github.io/postcss-responsive-hints"])) {
+    display: none;
+  }
+
+  .prose :global(li + li) {
+    margin-top: 0.35rem;
+  }
+
+  h2 {
+    margin: 0 0 1rem;
+    font-size: 1.5rem /* | 1.75rem | x */;
+  }
+
+  h2::before {
+    content: "// " / "";
+    color: var(--accent);
+  }
+</style>
