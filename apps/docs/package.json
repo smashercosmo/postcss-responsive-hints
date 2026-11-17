@@ -1,0 +1,26 @@
+{
+  "name": "docs",
+  "private": true,
+  "type": "module",
+  "imports": {
+    "#root/*": "./src/*",
+    "#components/*": "./src/components/*"
+  },
+  "scripts": {
+    "dev": "astro dev",
+    "build": "ASTRO_TELEMETRY_DISABLED=1 astro build",
+    "preview": "astro preview",
+    "typecheck": "ASTRO_TELEMETRY_DISABLED=1 astro sync && tsc"
+  },
+  "dependencies": {
+    "astro": "catalog:dev",
+    "microlighter": "catalog:ui",
+    "postcss": "catalog:dev",
+    "postcss-responsive-hints": "workspace:*"
+  },
+  "devDependencies": {
+    "@smashercosmo/configs": "catalog:dev",
+    "@types/node": "catalog:types",
+    "typescript": "catalog:dev"
+  }
+}

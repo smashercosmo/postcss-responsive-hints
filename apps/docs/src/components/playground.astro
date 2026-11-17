@@ -1,0 +1,187 @@
+---
+const EXAMPLE = `.card {
+  padding: 16px | 24px | x | 32px;
+  font-size: 14px | 16px | x | 18px;
+
+  @media (min-width: 768px) {
+    border: 1px solid;
+  }
+
+  @supports (display: grid) {
+    gap: 8px | 16px | x | x;
+  }
+}
+`;
+---
+
+<form class="playground" data-playground>
+  <div class="playground__options">
+    <label
+      class="playground__option playground__option--wide"
+      for="playground-breakpoints"
+    >
+      <span>breakpoints</span>
+      <input
+        id="playground-breakpoints"
+        name="breakpoints"
+        value="480px, 768px, 1024px, 1200px"
+        spellcheck="false"
+        autocomplete="off"
+      />
+    </label>
+    <label class="playground__option" for="playground-comments">
+      <input
+        id="playground-comments"
+        type="checkbox"
+        name="comments"
+        autocomplete="off"
+      />
+      <span>comments</span>
+    </label>
+  </div>
+
+  <div class="playground__panes">
+    <label class="pane" for="playground-input">
+      <span class="pane__title">Input</span>
+      <textarea
+        id="playground-input"
+        name="input"
+        rows="14"
+        spellcheck="false"
+        autocapitalize="off"
+        autocomplete="off">{EXAMPLE}</textarea
+      >
+    </label>
+    <div class="pane">
+      <span class="pane__title" id="playground-output">Output</span>
+      {
+        /**
+         * A named region, and focusable, so the output can be found and
+         * scrolled with the keyboard. It isn't a live region: it changes on
+         * every keystroke, and would be read out whole every time.
+         */
+      }
+      <pre
+        class="pane__output"
+        role="region"
+        tabindex="0"
+        aria-labelledby="playground-output"><code class="language-css" data-output></code></pre>
+    </div>
+  </div>
+
+  {
+    /**
+     * Announces that the output changed, or the error, once typing pauses. The
+     * output itself shows the same, so this is for screen readers only.
+     */
+  }
+  <p class="visually-hidden" role="status" data-status></p>
+</form>
+
+<script>
+  // oxlint-disable-next-line import/no-unassigned-import -- runs the playground
+  import "#root/scripts/playground.js";
+</script>
+
+<style>
+  .playground {
+    border: 1px solid var(--rule);
+    background: var(--paper-raised);
+  }
+
+  .playground__options {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.75rem 1.5rem;
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid var(--rule);
+    font: 0.8rem var(--mono);
+  }
+
+  .playground__option {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--ink-muted);
+  }
+
+  .playground__option--wide {
+    flex: 1 1 18rem;
+  }
+
+  .playground__option input[type="checkbox"] {
+    accent-color: var(--accent);
+  }
+
+  .playground__option input:not([type]) {
+    flex: 1;
+    min-width: 0;
+    padding: 0.3rem 0.5rem;
+    border: 1px solid var(--control-border);
+    background: var(--paper);
+    color: var(--ink);
+    font: inherit;
+  }
+
+  .playground__panes {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) /* | minmax(0, 1fr) minmax(0, 1fr) | x */;
+  }
+
+  .pane {
+    display: grid;
+    grid-template-rows: auto 1fr;
+    min-width: 0;
+  }
+
+  /* The wrapper of the "Copy" button, so the output fills the pane */
+  .pane > :global(.code-block) {
+    display: grid;
+  }
+
+  .pane + .pane {
+    border-top: 1px solid var(--rule) /* | 0 | x */;
+    border-inline-start: 0 /* | 1px solid var(--rule) | x */;
+  }
+
+  .pane__title {
+    padding: 0.4rem 1rem;
+    border-bottom: 1px solid var(--rule);
+    color: var(--ink-muted);
+    font: 0.7rem var(--mono);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  textarea,
+  .pane__output {
+    width: 100%;
+    min-height: 18rem;
+    margin: 0;
+    padding: 1rem;
+    border: 0;
+    background: var(--code-bg);
+    color: var(--ink);
+    font-size: 0.85rem;
+    line-height: 1.6;
+    tab-size: 2;
+  }
+
+  textarea {
+    resize: vertical;
+  }
+
+  textarea:focus-visible {
+    outline-offset: -2px;
+  }
+
+  .pane__output {
+    overflow: auto;
+  }
+
+  .pane__output[data-error] {
+    color: var(--danger);
+    white-space: pre-wrap;
+  }
+</style>

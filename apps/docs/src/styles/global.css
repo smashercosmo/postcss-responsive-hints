@@ -1,0 +1,220 @@
+/*
+ * Paper and ink: a warm off-white page, near-black text, and a vermilion
+ * accent that turns amber in the dark theme. Corners are square, headings and
+ * labels are monospace, like the CSS the plugin writes.
+ */
+:root {
+  color-scheme: light dark;
+  --paper: light-dark(oklch(98.2% 0.009 85), oklch(17.5% 0.008 60));
+  --paper-raised: light-dark(oklch(99.6% 0.004 85), oklch(21% 0.009 60));
+  --ink: light-dark(oklch(23% 0.015 55), oklch(92% 0.012 80));
+  --ink-muted: light-dark(oklch(47% 0.02 60), oklch(71% 0.015 75));
+  --rule: light-dark(oklch(87% 0.015 75), oklch(32% 0.012 60));
+  /* The outline of controls, 3:1 or more against every surface they sit on */
+  --control-border: light-dark(oklch(60% 0.02 65), oklch(55% 0.015 70));
+  --grid: light-dark(oklch(93% 0.012 80), oklch(23% 0.008 60));
+  --accent: light-dark(oklch(57% 0.2 33), oklch(78% 0.14 62));
+  --accent-ink: light-dark(oklch(99% 0.01 85), oklch(18% 0.02 60));
+  --accent-wash: light-dark(oklch(94% 0.04 45), oklch(28% 0.05 60));
+  --danger: light-dark(oklch(52% 0.19 25), oklch(74% 0.14 25));
+  --code-bg: light-dark(oklch(96.5% 0.012 80), oklch(14.5% 0.006 60));
+  --sans:
+    system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+  --mono:
+    ui-monospace, "SF Mono", "Cascadia Code", "JetBrains Mono", Menlo, Consolas,
+    monospace;
+  --measure: 46rem;
+}
+
+:root[data-theme="light"] {
+  color-scheme: light;
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+}
+
+/* In a layer, so any unlayered style overrides it */
+@layer reset {
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+  }
+}
+
+html {
+  scroll-padding-top: 1.5rem;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font: 1rem/1.65 var(--sans);
+}
+
+a {
+  color: var(--accent);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.2em;
+}
+
+a:hover {
+  text-decoration-thickness: 2px;
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+h1,
+h2,
+h3 {
+  font-family: var(--mono);
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  text-wrap: balance;
+}
+
+code,
+kbd,
+pre,
+textarea {
+  font-family: var(--mono);
+}
+
+:not(pre) > code {
+  padding: 0.05em 0.3em;
+  border: 1px solid var(--rule);
+  background: var(--code-bg);
+  font-size: 0.875em;
+}
+
+pre {
+  margin: 1.25rem 0;
+  padding: 1rem 1.25rem;
+  overflow-x: auto;
+  border: 1px solid var(--rule);
+  border-inline-start: 3px solid var(--accent);
+  font-size: 0.875rem;
+  line-height: 1.6;
+  tab-size: 2;
+}
+
+/*
+ * Microlighter's flexoki theme, on the code background of the page. The theme
+ * sets color-scheme on body, which would override the one of the theme toggle.
+ */
+body[data-syntax-theme] {
+  --syntax-background: var(--code-bg);
+  --syntax-foreground: var(--ink);
+  color-scheme: inherit;
+}
+
+/*
+ * Tables scroll in a wrapper (see index.astro), not by themselves: a table
+ * with another display can lose its table semantics.
+ */
+.table-scroll {
+  margin: 1.25rem 0;
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+th,
+td {
+  padding: 0.5rem 0.75rem;
+  border-bottom: 1px solid var(--rule);
+  text-align: start;
+  vertical-align: top;
+}
+
+th {
+  border-bottom-width: 2px;
+  font-weight: 600;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* The "Copy" button of code blocks, added by the client script */
+.code-block {
+  position: relative;
+}
+
+.code-block > pre {
+  padding-inline-end: 4.5rem;
+}
+
+/* The button and its message, in the top right corner of the block */
+.code-block .copy {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font: 0.75rem var(--mono);
+}
+
+.code-block .copy__button {
+  min-inline-size: 24px;
+  min-block-size: 24px;
+  padding: 0.15rem 0.5rem;
+  border: 1px solid var(--control-border);
+  background: var(--paper-raised);
+  color: var(--ink-muted);
+  font: inherit;
+  cursor: pointer;
+}
+
+/*
+ * "Copied" or "Copy failed". The same element is the live region that
+ * announces it, so it's emptied, not hidden, when there's nothing to say.
+ */
+.code-block .copy__status {
+  order: -1;
+}
+
+.code-block .copy__status:not(:empty) {
+  padding: 0.15rem 0.4rem;
+  background: var(--ink);
+  color: var(--paper);
+}
+
+/*
+ * Where there's hover, the button shows on hover and on focus. Touch screens
+ * have none, so there the button is always there.
+ */
+@media (hover: hover) {
+  .code-block .copy__button {
+    opacity: 0;
+    transition: opacity 0.15s;
+  }
+
+  .code-block:hover .copy__button,
+  .code-block:focus-within .copy__button,
+  .code-block .copy__button[data-copied] {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .code-block .copy__button {
+    transition: none;
+  }
+}

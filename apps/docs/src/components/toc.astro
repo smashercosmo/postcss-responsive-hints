@@ -1,0 +1,97 @@
+---
+import { sectionTimeline } from "#root/site.js";
+
+interface Props {
+  items: readonly { id: string; label: string; depth: number }[];
+}
+
+const { items } = Astro.props;
+---
+
+<nav class="toc" aria-labelledby="toc-title">
+  <p class="toc__title" id="toc-title">On this page</p>
+  <ol>
+    {
+      items.map(({ id, label, depth }) => (
+        <li class:list={{ "toc__item--nested": depth > 2 }}>
+          <a href={`#${id}`} style={`--timeline: ${sectionTimeline(id)}`}>
+            {label}
+          </a>
+        </li>
+      ))
+    }
+  </ol>
+</nav>
+
+<script>
+  import { initToc } from "#root/scripts/toc.js";
+
+  initToc();
+</script>
+
+<style>
+  .toc {
+    font: 0.8rem/1.5 var(--mono);
+  }
+
+  .toc__title {
+    margin: 0 0 0.75rem;
+    color: var(--ink-muted);
+    font-size: 0.7rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  ol {
+    margin: 0;
+    padding: 0;
+    border-inline-start: 1px solid var(--rule);
+    list-style: none;
+  }
+
+  a {
+    display: block;
+    margin-inline-start: -1px;
+    padding: 0.2rem 0.75rem;
+    border-inline-start: 2px solid transparent;
+    color: var(--ink-muted);
+    text-decoration: none;
+  }
+
+  .toc__item--nested a {
+    padding-inline-start: 1.5rem;
+  }
+
+  a:hover {
+    color: var(--ink);
+  }
+
+  /*
+   * The section being read. Every link follows the view timeline of its
+   * section, and is highlighted while the section crosses a line a fifth of the
+   * way down the viewport. Without scroll-driven animations, the aria-current
+   * that the script sets on the same link is highlighted instead.
+   */
+  @supports (animation-timeline: view()) {
+    a {
+      animation: toc-current linear;
+      animation-timeline: var(--timeline);
+      animation-range: cover;
+    }
+  }
+
+  @supports not (animation-timeline: view()) {
+    a[aria-current="true"] {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+  }
+
+  @keyframes toc-current {
+    from,
+    to {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+  }
+</style>

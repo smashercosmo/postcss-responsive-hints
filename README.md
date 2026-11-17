@@ -1,85 +1,39 @@
 # postcss-responsive-hints
 
-PostCSS plugin that makes it easier to write responsive styles.
-Heavily inspired by [styled-system](https://github.com/jxnblk/styled-system).
-
-## Installation
-
-```console
-$ npm install postcss-responsive-hints
-```
-
-## Usage
-
-```js
-const postcss = require("postcss");
-
-const output = postcss()
-  .use(require("postcss-responsive-hints")({/* options */}))
-  .process(require("fs").readFileSync("input.css", "utf8")).css;
-```
-
-Having the following styles in `input.css`:
+A [PostCSS](https://postcss.org) plugin for writing responsive values inline:
 
 ```css
-.test {
+.card {
   padding: 10px | 20px | x | 30px;
 }
 ```
 
-you will get:
+becomes a base value plus one `min-width` media query per breakpoint:
 
 ```css
-.test {
+.card {
   padding: 10px;
-}
-
-@media (min-width: 480px) {
-  .test {
+  @media (min-width: 768px) {
     padding: 20px;
   }
-}
-
-/* 768px media query will be skipped */
-
-@media (min-width: 1024px) {
-  .test {
+  @media (min-width: 1200px) {
     padding: 30px;
   }
 }
 ```
 
-## Options
+**See the [docs site](https://smashercosmo.github.io/postcss-responsive-hints/), with a playground, or the
+[package README](./packages/postcss-responsive-hints/README.md) for
+installation, usage and options.**
 
-#### breakpoints: `Array<string>`
+## Repository
 
-> default: `['480px', '768px', '1024px', '1200px']`
+| Path                                                                       | Contents                                         |
+| -------------------------------------------------------------------------- | ------------------------------------------------ |
+| [`packages/postcss-responsive-hints`](./packages/postcss-responsive-hints) | The plugin, published to npm                     |
+| [`apps/example`](./apps/example)                                           | A Vite app that uses the plugin from the source  |
+| [`apps/docs`](./apps/docs)                                                 | The docs site, built with Astro, on GitHub Pages |
 
-Provide a custom set of breakpoints
+## License
 
-#### comments: `boolean`
-
-> default: `false`
-
-Allows to avoid non-standard syntax by wrapping responsive
-hints in css comments
-
-Example:
-
-```css
-.test {
-  padding: 10px /* | 20px | x | 30px */;
-}
-```
-
-## TODO
-
-- Write better docs
-- Write tests
-- Make semantic-release work
-
-## Local github workflow testing
-
-- Install [Docker](https://www.docker.com/products/docker-desktop/)
-- Install [Act](https://nektosact.com/installation/index.html)
-- Run `docker build -t custom-act-image .` (to make jq and mocked GitHub CLI available in container)
+[MIT](./LICENSE)

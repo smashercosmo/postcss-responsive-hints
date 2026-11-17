@@ -1,25 +1,33 @@
 {
   "name": "postcss-responsive-hints",
   "version": "2.0.6",
-  "sideEffects": false,
-  "type": "module",
+  "description": "PostCSS plugin for writing responsive values inline",
+  "keywords": [
+    "postcss",
+    "postcss-plugin",
+    "css",
+    "responsive",
+    "responsive-design",
+    "media-queries",
+    "breakpoints",
+    "styled-system"
+  ],
+  "homepage": "https://smashercosmo.github.io/postcss-responsive-hints/",
+  "bugs": {
+    "url": "https://github.com/smashercosmo/postcss-responsive-hints/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/smashercosmo/postcss-responsive-hints.git",
+    "directory": "packages/postcss-responsive-hints"
+  },
+  "license": "MIT",
+  "author": "Vladislav Shkodin <smashercosmo@gmail.com>",
   "files": [
     "dist"
   ],
-  "scripts": {
-    "build": "tsdown",
-    "dev": "tsdown --watch",
-    "typecheck": "tsc --noEmit"
-  },
-  "devDependencies": {
-    "@root/shared": "workspace:*",
-    "@root/tsconfig": "workspace:*",
-    "postcss": "catalog:dev",
-    "tsdown": "catalog:dev"
-  },
-  "peerDependencies": {
-    "postcss": ">=8"
-  },
+  "type": "module",
+  "sideEffects": false,
   "exports": {
     ".": "./src/index.ts",
     "./package.json": "./package.json"
@@ -29,5 +37,25 @@
       ".": "./dist/index.js",
       "./package.json": "./package.json"
     }
+  },
+  "scripts": {
+    "build": "tsdown",
+    "dev": "tsdown --watch",
+    "test": "vitest run",
+    "typecheck": "tsc"
+  },
+  "devDependencies": {
+    "@smashercosmo/configs": "catalog:dev",
+    "@types/node": "catalog:types",
+    "postcss": "catalog:dev",
+    "tsdown": "catalog:dev",
+    "typescript": "catalog:dev",
+    "vitest": "catalog:test"
+  },
+  "peerDependencies": {
+    "postcss": ">=8"
+  },
+  "engines": {
+    "node": ">=20"
   }
 }

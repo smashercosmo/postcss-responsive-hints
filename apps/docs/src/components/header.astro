@@ -1,0 +1,109 @@
+---
+import ThemeToggle from "#components/theme-toggle.astro";
+import { NPM_URL, REPO_URL, VERSION, withBase } from "#root/site.js";
+
+const HOME_URL = withBase();
+const CHANGELOG_URL = withBase("changelog/");
+const { pathname } = Astro.url;
+---
+
+<header class="header">
+  <a class="wordmark" href={HOME_URL} aria-label="postcss-responsive-hints, home">
+    <span class="wordmark__scope">postcss-</span>responsive<span
+      class="wordmark__pipe">|</span
+    >hints
+  </a>
+  <a class="version" href={CHANGELOG_URL}
+    ><span class="visually-hidden">Changelog, </span>v{VERSION}</a
+  >
+  <nav class="nav" aria-label="Main">
+    <a href={HOME_URL} aria-current={pathname === HOME_URL ? "page" : undefined}
+      >Docs</a
+    >
+    <a
+      href={CHANGELOG_URL}
+      aria-current={pathname === CHANGELOG_URL ? "page" : undefined}
+      >Changelog</a
+    >
+    <a href={REPO_URL}>GitHub</a>
+    <a href={NPM_URL}>npm</a>
+  </nav>
+  <ThemeToggle />
+</header>
+
+<style>
+  .header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem 1.25rem;
+    /* The border spans the window, the content lines up with the hero's */
+    padding: 1rem max(1rem, (100% - 69rem) / 2);
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .wordmark {
+    color: var(--ink);
+    font: 700 1.05rem var(--mono);
+    letter-spacing: -0.02em;
+    text-decoration: none;
+  }
+
+  .wordmark__scope {
+    color: var(--ink-muted);
+    font-weight: 400;
+  }
+
+  .wordmark__pipe {
+    margin-inline: 0.1em;
+    color: var(--accent);
+  }
+
+  .version {
+    padding: 0.05rem 0.4rem;
+    border: 1px solid var(--control-border);
+    color: var(--ink-muted);
+    font: 0.75rem var(--mono);
+    text-decoration: none;
+  }
+
+  .version:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  .nav {
+    display: flex;
+    gap: 1.25rem;
+    margin-inline-start: auto;
+    font: 0.85rem var(--mono);
+  }
+
+  .nav a {
+    color: var(--ink);
+    text-decoration: none;
+  }
+
+  .nav a:hover {
+    color: var(--accent);
+  }
+
+  .nav a[aria-current="page"] {
+    color: var(--accent);
+    text-decoration: underline;
+    text-underline-offset: 0.35em;
+  }
+
+  /* On narrow screens, the navigation goes onto its own row. */
+  @media (max-width: 42rem) {
+    .wordmark__scope {
+      display: none;
+    }
+
+    .nav {
+      order: 1;
+      flex-basis: 100%;
+      margin-inline-start: 0;
+    }
+  }
+</style>

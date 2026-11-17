@@ -1,60 +1,36 @@
 {
   "name": "root",
-  "private": true,
   "version": "0.0.0",
-  "description": "PostCSS plugin that makes it easier to write responsive styles",
-  "keywords": [
-    "postcss",
-    "postcss-plugin"
-  ],
-  "homepage": "https://github.com/smashercosmo/postcss-responsive-hints#readme",
-  "bugs": {
-    "url": "https://github.com/smashercosmo/postcss-responsive-hints/issues"
-  },
+  "private": true,
   "license": "MIT",
   "author": "Vladislav Shkodin <smashercosmo@gmail.com>",
   "type": "module",
   "scripts": {
-    "build": "turbo build",
-    "dev": "turbo dev",
-    "test": "turbo test",
-    "test:ci": "turbo test --filter=!@root/github",
-    "typecheck": "turbo typecheck && tsc --noEmit",
-    "cleanup": "rm -rf node_modules .turbo pnpm-lock.json && pnpm -r exec rm -rf .turbo node_modules dist",
+    "build": "pnpm -r run build",
+    "dev": "pnpm -r --parallel run dev",
+    "test": "pnpm -r --if-present run test",
+    "lint:ox": "oxlint",
+    "lint:types": "pnpm -r --if-present run typecheck && tsc",
+    "lint": "pnpm lint:ox && pnpm lint:types",
     "format": "oxfmt",
-    "lint": "oxlint",
-    "lint:actions": "eslint .github/**/*.yml",
-    "update:deps": "pnpm up -r --latest --interactive",
-    "update:actions": "actions-up"
+    "cleanup": "rm -rf node_modules && pnpm -r exec rm -rf node_modules dist",
+    "update:deps": "pnpm up -r --latest --interactive"
   },
   "devDependencies": {
-    "@commitlint/cli": "catalog:dev",
-    "@commitlint/cz-commitlint": "catalog:dev",
-    "@pnpm/types": "catalog:types",
-    "@root/shared": "workspace:*",
-    "@root/tsconfig": "workspace:*",
-    "actions-up": "catalog:dev",
-    "clean-publish": "catalog:dev",
-    "commitizen": "catalog:dev",
-    "cz-conventional-changelog": "catalog:dev",
-    "eslint": "catalog:lint",
-    "eslint-plugin-github-action": "catalog:lint",
-    "eslint-plugin-no-only-tests": "catalog:lint",
-    "eslint-plugin-perfectionist": "catalog:lint",
-    "eslint-plugin-react-hooks": "catalog:lint",
-    "eslint-plugin-unused-imports": "catalog:lint",
+    "@smashercosmo/configs": "catalog:dev",
+    "@types/node": "catalog:types",
+    "eslint-plugin-regexp": "catalog:lint",
     "oxfmt": "catalog:dev",
     "oxlint": "catalog:lint",
-    "turbo": "catalog:dev",
-    "typescript": "catalog:dev",
-    "vitest": "catalog:test",
-    "yaml-eslint-parser": "catalog:lint"
+    "oxlint-tsgolint": "catalog:lint",
+    "typescript": "catalog:dev"
   },
   "devEngines": {
-    "packageManager": {
-      "name": "pnpm",
-      "version": "v12.3.4",
+    "runtime": {
+      "name": "node",
+      "version": "^26.0.0",
       "onFail": "download"
     }
-  }
+  },
+  "packageManager": "pnpm@12.21.0"
 }

@@ -1,0 +1,191 @@
+---
+/**
+ * Shows which value of `padding: 10px | 20px | x | 30px` applies at which
+ * viewport width, with the default breakpoints, on a scale from 0 to 1440px.
+ */
+const SCALE = 1440;
+
+const segments = [
+  { from: 0, to: 768, value: "10px", note: "base" },
+  { from: 768, to: 1024, value: "20px", note: "≥ 768px" },
+  { from: 1024, to: 1200, value: "20px", note: "x", isSkipped: true },
+  { from: 1200, to: SCALE, value: "30px", note: "≥ 1200px" },
+];
+
+const ticks = [
+  { at: 480, label: "480", isBase: true },
+  { at: 768, label: "768" },
+  { at: 1024, label: "1024" },
+  { at: 1200, label: "1200" },
+];
+
+const columns = segments
+  .map(({ from, to }) => `${to - from}fr`)
+  .join(" ");
+---
+
+<figure class="ruler">
+  <code class="ruler__declaration">
+    <span class="ruler__prop">padding:</span>
+    <span class="ruler__value">10px</span><span class="ruler__pipe">|</span><span
+      class="ruler__value">20px</span
+    ><span class="ruler__pipe">|</span><span
+      class="ruler__value ruler__value--skip">x</span
+    ><span class="ruler__pipe">|</span><span class="ruler__value">30px</span>;
+  </code>
+
+  <div class="ruler__scale" aria-hidden="true">
+    <div class="ruler__ticks">
+      {
+        ticks.map(({ at, label, isBase }) => (
+          <span
+            class:list={["ruler__tick", { "ruler__tick--base": isBase }]}
+            style={`--at: ${(at / SCALE) * 100}%`}
+          >
+            {label}
+          </span>
+        ))
+      }
+    </div>
+    <div class="ruler__track" style={`grid-template-columns: ${columns}`}>
+      {
+        segments.map(({ value, note, isSkipped }) => (
+          <div
+            class:list={["ruler__segment", { "ruler__segment--skip": isSkipped }]}
+          >
+            <span class="ruler__segment-value">{value}</span>
+            <span class="ruler__segment-note">{note}</span>
+          </div>
+        ))
+      }
+    </div>
+  </div>
+
+  <figcaption class="ruler__caption">
+    The base value applies from 0. Every following value applies from its
+    breakpoint up, and <code>x</code> keeps the previous one: 10px below 768px,
+    20px from 768px, 30px from 1200px.
+  </figcaption>
+</figure>
+
+<style>
+  .ruler {
+    margin: 0;
+    padding: 1.25rem /* | 1.5rem | 2rem */;
+    border: 1px solid var(--rule);
+    background: var(--paper-raised);
+  }
+
+  .ruler__declaration {
+    display: block;
+    margin-bottom: 1.75rem;
+    font-size: 1rem /* | 1.25rem | 1.4rem */;
+    font-weight: 600;
+    white-space: nowrap;
+    overflow-x: auto;
+    /* A block of its own, not the boxed inline code of running text */
+    padding: 0;
+    border: 0;
+    background: none;
+  }
+
+  .ruler__prop {
+    margin-inline-end: 0.5em;
+    color: var(--ink-muted);
+  }
+
+  .ruler__pipe {
+    margin-inline: 0.35em;
+    color: var(--accent);
+  }
+
+  .ruler__value--skip {
+    color: var(--ink-muted);
+    text-decoration: line-through;
+  }
+
+  .ruler__ticks {
+    position: relative;
+    height: 1.5rem;
+    color: var(--ink-muted);
+    font-family: var(--mono);
+    font-size: 0.65rem /* | 0.75rem | x */;
+  }
+
+  .ruler__tick {
+    position: absolute;
+    bottom: 0;
+    left: var(--at);
+    padding-bottom: 0.3rem;
+    translate: -50% 0;
+  }
+
+  /* A notch on the track, below the label */
+  .ruler__tick::after {
+    content: "";
+    position: absolute;
+    bottom: -0.35rem;
+    left: 50%;
+    height: 0.5rem;
+    border-inline-start: 1px solid currentcolor;
+  }
+
+  .ruler__tick--base {
+    opacity: 0.6;
+  }
+
+  .ruler__track {
+    display: grid;
+    border: 1px solid var(--ink);
+  }
+
+  .ruler__segment {
+    display: grid;
+    gap: 0.1rem;
+    min-width: 0;
+    padding: 0.5rem 0.15rem /* | 0.5rem 0.4rem | x */;
+    background: var(--accent-wash);
+    font-family: var(--mono);
+    text-align: center;
+  }
+
+  .ruler__segment + .ruler__segment {
+    border-inline-start: 1px solid var(--ink);
+  }
+
+  /* The "x" keeps 20px: drawn as hatching over the same wash */
+  .ruler__segment--skip {
+    background:
+      repeating-linear-gradient(
+        -45deg,
+        transparent 0 4px,
+        color-mix(in oklab, var(--accent) 25%, transparent) 4px 5px
+      ),
+      var(--accent-wash);
+  }
+
+  .ruler__segment-value {
+    overflow: hidden;
+    font-size: 0.75rem /* | 0.85rem | 0.95rem */;
+    font-weight: 700;
+    text-overflow: ellipsis;
+  }
+
+  .ruler__segment-note {
+    overflow: hidden;
+    color: var(--ink-muted);
+    font-size: 0.6rem /* | 0.7rem | x */;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .ruler__caption {
+    margin-top: 1rem;
+    color: var(--ink-muted);
+    font-size: 0.85rem;
+  }
+
+  .ruler__caption code {
+    font-size: 0.8rem;
+  }
+</style>
