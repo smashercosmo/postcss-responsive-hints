@@ -1,5 +1,11 @@
 name: Release
 
+# Every run also deploys the docs site, apps/docs, to GitHub Pages, built from
+# the `v<version>` tag of the released version, so the docs always match npm.
+# Nothing is deployed while a version waits for its approval on npm.
+#
+# Settings → Pages → Source must be "GitHub Actions", and the github-pages
+# environment has to allow deployments from main, where this workflow runs.
 on:
   push:
     branches: [main]
@@ -9,20 +15,18 @@ permissions: {}
 
 jobs:
   release:
+    # `pages: write` and `id-token: write` deploy the docs; `id-token: write`
+    # also stages the package on npm.
     permissions:
       contents: write
       id-token: write
-    uses: smashercosmo/actions/.github/workflows/release.yml@04f838252f6ef4b869ae9e98d850ede141ca450a # v0.4.0
+      pages: write
+    uses: smashercosmo/actions/.github/workflows/release.yml@abdfa51294bf4b5da839716d05754ee0b86ed99e # v0.5.0
     with:
       app-client-id: ${{ vars.RELEASE_BOT_CLIENT_ID }}
       npm: true
+      # Builds the docs site, and the workspace packages it depends on, with
+      # `pnpm --filter docs... build`, and deploys apps/docs/dist.
+      docs: true
     secrets:
       app-private-key: ${{ secrets.RELEASE_BOT_PRIVATE_KEY }}
-
-  docs:
-    needs: release
-    permissions:
-      contents: read
-      pages: write
-      id-token: write
-    uses: ./.github/workflows/pages.yml
