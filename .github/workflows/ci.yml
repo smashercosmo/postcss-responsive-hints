@@ -11,4 +11,4 @@ jobs:
   ci:
     permissions:
       contents: read
-    uses: smashercosmo/actions/.github/workflows/ci.yml@04f838252f6ef4b869ae9e98d850ede141ca450a # v0.4.0
+    uses: smashercosmo/actions/.github/workflows/ci.yml@abdfa51294bf4b5da839716d05754ee0b86ed99e # v0.5.0
